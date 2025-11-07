@@ -2,9 +2,10 @@
 
 🎿 **Automated data visualization pipeline that updates live snow conditions for all Colorado ski resorts**
 
-This project automatically fetches current snow conditions from RapidAPI's "Ski Resorts and Conditions" API and updates interactive Datawrapper visualizations every 2 hours:
-- **Live Map**: Pin markers showing all Colorado resorts with current conditions
-- **Live Table**: Sortable data table with snow depth, new snowfall, lifts, and runs
+This project automatically scrapes snow conditions from OnTheSnow and Colorado Ski Country USA, updates a Google Sheet, and powers a Datawrapper map every 2 hours:
+- **Live Map**: Interactive symbol map showing all 23 Colorado resorts with current conditions
+- **Google Sheets**: Central data source that Datawrapper reads from
+- **Automated**: Runs every 2 hours via GitHub Actions - completely hands-off!
 
 ---
 
@@ -25,17 +26,20 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Get API Credentials
+### 2. Set Up Google Sheets API
 
-**Datawrapper:**
-1. Create account at https://app.datawrapper.de/
-2. Generate API token at https://app.datawrapper.de/account/api-tokens
-3. Copy token
+**Follow the complete guide:** [GOOGLE_SHEETS_SETUP.md](GOOGLE_SHEETS_SETUP.md)
 
-**RapidAPI (Ski Resorts and Conditions):**
-1. Sign up at https://rapidapi.com
-2. Subscribe to "Ski Resorts and Conditions" API
-3. Get your RapidAPI key from the dashboard
+Quick summary:
+1. Create Google Cloud project
+2. Enable Google Sheets API
+3. Create service account & download JSON key
+4. Create new Google Sheet
+5. Share sheet with service account email
+
+**You'll get:**
+- Service account JSON credentials file
+- Google Sheet ID (from the sheet URL)
 
 ### 3. Create Environment File
 
@@ -43,15 +47,16 @@ Create a `.env` file in the project root:
 
 ```bash
 # .env
-DATAWRAPPER_API_KEY=your_datawrapper_token_here
-RAPIDAPI_KEY=your_rapidapi_key_here
 
-# Chart IDs (you'll create these in step 4)
-SNOW_MAP_CHART_ID=xxxxx
-SNOW_TABLE_CHART_ID=yyyyy
+# Google Sheets Configuration (REQUIRED)
+GOOGLE_SHEETS_SPREADSHEET_ID=your_sheet_id_here
+GOOGLE_CREDENTIALS='{"type":"service_account","project_id":"...","private_key":"..."}}'
+
+# Datawrapper (Optional - for future table view)
+DATAWRAPPER_API_KEY=EFDvH4jTgfczR76PhJuwlzH625xzLs7OIKGv9WYNfuRo7VWb3Kb1A1YlXGL2UinA
 ```
 
-**✅ Your `.env` file has already been created with your API keys!**
+**Note:** The `GOOGLE_CREDENTIALS` value should be the entire JSON from the service account key file (from Step 2).
 
 ### 4. Create Datawrapper Visualizations
 

@@ -65,10 +65,10 @@ def main():
     logging.info(f"Started at: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
     
     # Define all update scripts
-    # Note: Order matters - both map and table depend on the API fetcher
+    # Order: Scrape data → Update Google Sheets → Datawrapper reads from Sheets
     scripts = [
-        ("snow_map.py", "Snow Conditions Map"),
-        ("snow_table.py", "Snow Conditions Table"),
+        ("combined_scraper.py", "Combined Resort Data Scraper"),
+        ("google_sheets_updater.py", "Google Sheets Update"),
     ]
     
     # Run each script and track results

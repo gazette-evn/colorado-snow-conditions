@@ -43,13 +43,12 @@ jobs:
         # ChromeDriver is automatically managed by Selenium 4.x
         # No manual installation needed!
     
-    - name: Update snow conditions map and table
+    - name: Scrape data and update Google Sheets
       env:
-        DATAWRAPPER_API_KEY: ${{ secrets.DATAWRAPPER_API_KEY }}
-        SKIAPI_KEY: ${{ secrets.SKIAPI_KEY }}
-        SNOW_MAP_CHART_ID: ${{ secrets.SNOW_MAP_CHART_ID }}
-        SNOW_TABLE_CHART_ID: ${{ secrets.SNOW_TABLE_CHART_ID }}
+        GOOGLE_SHEETS_SPREADSHEET_ID: ${{ secrets.GOOGLE_SHEETS_SPREADSHEET_ID }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
       run: |
+        echo "Running combined scraper and Google Sheets update..."
         python run_all_updates.py
     
     - name: Upload logs as artifacts
