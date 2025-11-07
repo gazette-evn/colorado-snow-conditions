@@ -84,25 +84,26 @@ class GoogleSheetsUpdater:
             
             # Select and rename columns for Google Sheets
             # Include all useful data for Datawrapper Symbol Map
+            # Keep numeric values clean (no " symbols) for Datawrapper
             
-            # Format snow measurements with inches symbol
-            def format_snow(x):
+            # Convert to clean numeric values
+            def clean_numeric(x):
                 if pd.isna(x) or x == '':
-                    return '0"'
+                    return 0
                 try:
-                    return f'{float(x)}"'
+                    return float(x)
                 except:
-                    return str(x)
+                    return 0
             
             sheet_data = pd.DataFrame({
                 'Resort Name': df['name'],
                 'Latitude': df.get('latitude', df.get('lat', '')),
                 'Longitude': df.get('longitude', df.get('lng', '')),
                 'Status': df.get('status', 'Unknown'),
-                '24h Snowfall': df.get('new_snow_24h', 0).apply(format_snow),
-                '48h Snowfall': df.get('new_snow_48h', 0).apply(format_snow),
-                'Base Depth': df.get('base_depth', 0).apply(format_snow),
-                'Mid-Mtn Depth': df.get('mid_mtn_depth', 0).apply(format_snow),
+                '24h Snowfall (in)': df.get('new_snow_24h', 0).apply(clean_numeric),
+                '48h Snowfall (in)': df.get('new_snow_48h', 0).apply(clean_numeric),
+                'Base Depth (in)': df.get('base_depth', 0).apply(clean_numeric),
+                'Mid-Mtn Depth (in)': df.get('mid_mtn_depth', 0).apply(clean_numeric),
                 'Surface Conditions': df.get('surface_conditions', ''),
                 'Lifts Open': df.get('lifts_open', '0/0'),
                 'Open Lifts': df.get('open_lifts', 0),
