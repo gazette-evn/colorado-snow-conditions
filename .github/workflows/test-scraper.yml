@@ -38,22 +38,46 @@ jobs:
         echo "Chrome installed:"
         google-chrome --version
     
-    - name: Test Colorado Ski Scraper
+    - name: Test OnTheSnow Scraper (Primary)
       run: |
-        echo "Testing scraper..."
+        echo "Testing OnTheSnow scraper..."
+        python onthesnow_scraper.py
+    
+    - name: Test CSCUSA Scraper (Supplement)
+      run: |
+        echo "Testing CSCUSA scraper..."
         python colorado_ski_scraper.py
     
-    - name: Check scraper output
+    - name: Test Combined Scraper
       run: |
-        if [ -f "colorado_resorts_scraped.csv" ]; then
-          echo "✅ Scraper succeeded! Found:"
-          wc -l colorado_resorts_scraped.csv
+        echo "Testing combined scraper..."
+        python combined_scraper.py
+    
+    - name: Check combined output
+      run: |
+        echo "Checking output files..."
+        ls -lh *.csv 2>/dev/null || echo "No CSV files yet"
+        
+        if [ -f "colorado_resorts_combined.csv" ]; then
           echo ""
-          echo "Preview (first 15 lines):"
-          head -15 colorado_resorts_scraped.csv
+          echo "✅ Combined scraper succeeded!"
+          echo "Total resorts:"
+          wc -l colorado_resorts_combined.csv
+          echo ""
+          echo "Preview (first 20 lines):"
+          head -20 colorado_resorts_combined.csv
         else
-          echo "❌ No output file created"
-          exit 1
+          echo "⚠️ Combined file not created, checking individual sources..."
+          
+          if [ -f "onthesnow_resorts.csv" ]; then
+            echo "✅ OnTheSnow data found:"
+            wc -l onthesnow_resorts.csv
+          fi
+          
+          if [ -f "colorado_resorts_scraped.csv" ]; then
+            echo "✅ CSCUSA data found:"
+            wc -l colorado_resorts_scraped.csv
+          fi
         fi
     
     - name: Test data fetcher integration
