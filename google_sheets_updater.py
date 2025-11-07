@@ -83,16 +83,34 @@ class GoogleSheetsUpdater:
             df = pd.read_csv(csv_file)
             
             # Select and rename columns for Google Sheets
-            # Keep it simple for Datawrapper Symbol Map
+            # Include all useful data for Datawrapper Symbol Map
+            
+            # Format snow measurements with inches symbol
+            def format_snow(x):
+                if pd.isna(x) or x == '':
+                    return '0"'
+                try:
+                    return f'{float(x)}"'
+                except:
+                    return str(x)
+            
             sheet_data = pd.DataFrame({
                 'Resort Name': df['name'],
                 'Latitude': df.get('latitude', df.get('lat', '')),
                 'Longitude': df.get('longitude', df.get('lng', '')),
                 'Status': df.get('status', 'Unknown'),
-                '24h Snowfall': df.get('new_snow_24h', 0).apply(lambda x: f'{x}"' if pd.notna(x) else '0"'),
-                'Base Depth': df.get('base_depth', 0).apply(lambda x: f'{x}"' if pd.notna(x) else '0"'),
+                '24h Snowfall': df.get('new_snow_24h', 0).apply(format_snow),
+                '48h Snowfall': df.get('new_snow_48h', 0).apply(format_snow),
+                'Base Depth': df.get('base_depth', 0).apply(format_snow),
+                'Mid-Mtn Depth': df.get('mid_mtn_depth', 0).apply(format_snow),
+                'Surface Conditions': df.get('surface_conditions', ''),
                 'Lifts Open': df.get('lifts_open', '0/0'),
+                'Open Lifts': df.get('open_lifts', 0),
+                'Total Lifts': df.get('total_lifts', 0),
                 'Trails Open': df.get('trails_open', '0/0'),
+                'Open Trails': df.get('open_trails', 0),
+                'Total Trails': df.get('total_trails', 0),
+                'Data Source': df.get('source', ''),
                 'Last Updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             })
             
