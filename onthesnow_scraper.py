@@ -171,13 +171,37 @@ class OnTheSnowScraper:
                 resort['base_depth'] = self._parse_measurement(base_span.get_text(strip=True)) if base_span else 0
                 
                 # Column 4: Trails open (format: "4/140")
+                # Cell structure: <span class="h4">4/140<div class="small">3% Open</div></span>
+                # We only want "4/140", not the nested div text
                 trails_span = cells[4].find('span', class_=lambda x: x and 'h4' in x)
-                trails_text = trails_span.get_text(strip=True) if trails_span else '0/0'
+                if trails_span:
+                    # Get only direct text, not from child elements
+                    # Use .contents to filter out nested divs
+                    direct_text = ''.join([str(c) for c in trails_span.contents if isinstance(c, str)])
+                    trails_text = direct_text.strip().rstrip('-')
+                    # If empty, try the first text node
+                    if not trails_text or '/' not in trails_text:
+                        all_text = trails_span.get_text(strip=True)
+                        # Extract just the X/Y part before any letters
+                        match = re.match(r'(\d+/\d+)', all_text)
+                        trails_text = match.group(1) if match else '0/0'
+                else:
+                    trails_text = '0/0'
                 resort['trails_open'] = trails_text
                 
                 # Column 5: Lifts open (format: "4/21")
                 lifts_span = cells[5].find('span', class_=lambda x: x and 'h4' in x)
-                lifts_text = lifts_span.get_text(strip=True) if lifts_span else '0/0'
+                if lifts_span:
+                    # Get only direct text, not from child elements
+                    direct_text = ''.join([str(c) for c in lifts_span.contents if isinstance(c, str)])
+                    lifts_text = direct_text.strip().rstrip('-')
+                    # If empty, extract X/Y pattern
+                    if not lifts_text or '/' not in lifts_text:
+                        all_text = lifts_span.get_text(strip=True)
+                        match = re.match(r'(\d+/\d+)', all_text)
+                        lifts_text = match.group(1) if match else '0/0'
+                else:
+                    lifts_text = '0/0'
                 resort['lifts_open'] = lifts_text
                 
             else:
