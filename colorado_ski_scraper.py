@@ -100,117 +100,85 @@ class ColoradoSkiScraper:
         
         resorts = []
         
-        # This is where we need to identify the actual data structure
-        # Let's look for common patterns in the HTML
+        # Find all resort cards - they use class "one-snow-card"
+        resort_cards = soup.find_all('div', class_='one-snow-card')
+        logger.info(f"Found {len(resort_cards)} resort cards")
         
-        # Strategy 1: Look for table rows
-        tables = soup.find_all('table')
-        logger.info(f"Found {len(tables)} tables")
-        
-        for table in tables:
-            rows = table.find_all('tr')
-            for row in rows[1:]:  # Skip header
-                cells = row.find_all(['td', 'th'])
-                if len(cells) >= 4:  # Has enough data
-                    resort_data = self._extract_resort_from_row(cells)
-                    if resort_data:
-                        resorts.append(resort_data)
-        
-        # Strategy 2: Look for divs/articles with resort data
-        if not resorts:
-            logger.info("No table data found, looking for div/article structure")
-            resort_containers = soup.find_all(['div', 'article'], 
-                                             class_=lambda x: x and 'resort' in x.lower())
-            
-            for container in resort_containers:
-                resort_data = self._extract_resort_from_container(container)
+        for card in resort_cards:
+            try:
+                resort_data = self._extract_resort_from_card(card)
                 if resort_data:
                     resorts.append(resort_data)
-        
-        # Strategy 3: Look for specific data attributes
-        if not resorts:
-            logger.info("Trying data attribute strategy")
-            elements = soup.find_all(attrs={'data-resort': True})
-            for element in elements:
-                resort_data = self._extract_resort_from_element(element)
-                if resort_data:
-                    resorts.append(resort_data)
+            except Exception as e:
+                logger.warning(f"Error parsing resort card: {e}")
+                continue
         
         logger.info(f"Extracted {len(resorts)} resorts")
         
         return resorts
     
-    def _extract_resort_from_row(self, cells):
-        """Extract resort data from table row cells"""
+    def _extract_resort_from_card(self, card):
+        """Extract resort data from a one-snow-card div"""
         try:
-            # Adjust indices based on actual table structure
-            resort = {
-                'name': cells[0].get_text(strip=True),
-                'conditions': cells[1].get_text(strip=True) if len(cells) > 1 else '',
-                'new_snow_24h': self._parse_snow(cells[2].get_text(strip=True)) if len(cells) > 2 else 0,
-                'trails_open': self._parse_trails(cells[3].get_text(strip=True)) if len(cells) > 3 else '0/0',
-            }
+            resort = {}
             
-            # Only return if we got a valid resort name
-            if resort['name'] and len(resort['name']) > 2:
-                return resort
-                
-        except Exception as e:
-            logger.debug(f"Error parsing row: {e}")
-        
-        return None
-    
-    def _extract_resort_from_container(self, container):
-        """Extract resort data from div/article container"""
-        try:
-            resort = {
-                'name': '',
-                'conditions': '',
-                'new_snow_24h': 0,
-                'trails_open': '0/0',
-            }
+            # Get resort name from h3 with class "h5 text-left"
+            name_elem = card.find('h3', class_='h5 text-left')
+            if not name_elem:
+                name_elem = card.find('h3', class_='h5')
             
-            # Look for resort name
-            name_elem = container.find(['h1', 'h2', 'h3', 'h4', 'a'], 
-                                      class_=lambda x: x and ('name' in x.lower() or 'title' in x.lower()))
             if name_elem:
                 resort['name'] = name_elem.get_text(strip=True)
+            else:
+                return None
             
-            # Look for snow data
-            snow_elem = container.find(string=lambda x: x and 'snow' in x.lower())
-            if snow_elem:
-                resort['new_snow_24h'] = self._parse_snow(snow_elem)
+            # Get 24hr snow
+            twentyfour = card.find('span', class_='answer twentyfour')
+            resort['new_snow_24h'] = self._parse_snow(twentyfour.get_text(strip=True)) if twentyfour else 0
             
-            # Look for trail data
-            trail_elem = container.find(string=lambda x: x and 'trail' in x.lower())
-            if trail_elem:
-                resort['trails_open'] = self._parse_trails(trail_elem)
+            # Get 48hr snow
+            fortyeight = card.find('span', class_='answer fortyeight')
+            resort['new_snow_48h'] = self._parse_snow(fortyeight.get_text(strip=True)) if fortyeight else 0
             
-            if resort['name']:
-                return resort
-                
+            # Get mid-mountain depth
+            mid_mtn = card.find('span', class_='answer mid-mtn')
+            resort['mid_mtn_depth'] = self._parse_snow(mid_mtn.get_text(strip=True)) if mid_mtn else 0
+            
+            # Get surface conditions
+            surface = card.find('p', class_='surface')
+            if surface:
+                surface_span = surface.find('span')
+                resort['surface_conditions'] = surface_span.get_text(strip=True) if surface_span else ''
+            else:
+                resort['surface_conditions'] = ''
+            
+            # Get lifts open/total
+            lifts_elem = card.find('p', class_='lifts-open')
+            if lifts_elem:
+                open_span = lifts_elem.find('span', class_='open')
+                total_span = lifts_elem.find('span', class_='total')
+                if open_span and total_span:
+                    resort['lifts_open'] = f"{open_span.get_text(strip=True)}/{total_span.get_text(strip=True)}"
+                else:
+                    resort['lifts_open'] = '0/0'
+            else:
+                resort['lifts_open'] = '0/0'
+            
+            # Get status (Open/Closed)
+            status_open = card.find('span', class_='open')
+            status_closed = card.find('span', class_='closed')
+            if status_open and 'mt-3' in status_open.get('class', []):
+                resort['status'] = 'Open'
+            elif status_closed:
+                resort['status'] = 'Closed'
+            else:
+                resort['status'] = 'Unknown'
+            
+            return resort
+            
         except Exception as e:
-            logger.debug(f"Error parsing container: {e}")
-        
-        return None
-    
-    def _extract_resort_from_element(self, element):
-        """Extract resort data from element with data attributes"""
-        try:
-            resort = {
-                'name': element.get('data-resort', ''),
-                'conditions': element.get('data-conditions', ''),
-                'new_snow_24h': int(element.get('data-snow', 0)),
-                'trails_open': element.get('data-trails', '0/0'),
-            }
-            
-            if resort['name']:
-                return resort
-                
-        except Exception as e:
-            logger.debug(f"Error parsing element: {e}")
-        
-        return None
+            logger.warning(f"Error extracting resort card: {e}")
+            return None
     
     def _parse_snow(self, text):
         """Extract snow amount from text like '24-hour snow total: 5\"' """
@@ -262,19 +230,24 @@ class ColoradoSkiScraper:
     def _clean_data(self, df):
         """Clean and standardize the data"""
         # Ensure required columns exist
-        required_cols = ['name', 'conditions', 'new_snow_24h', 'trails_open']
+        required_cols = ['name', 'surface_conditions', 'new_snow_24h', 'new_snow_48h', 'mid_mtn_depth', 'lifts_open', 'status']
         for col in required_cols:
             if col not in df.columns:
-                df[col] = '' if col in ['name', 'conditions', 'trails_open'] else 0
+                if col in ['name', 'surface_conditions', 'lifts_open', 'status']:
+                    df[col] = ''
+                else:
+                    df[col] = 0
         
-        # Parse trails into separate columns
-        if 'trails_open' in df.columns:
-            df[['open_trails', 'total_trails']] = df['trails_open'].str.extract(r'(\d+)/(\d+)')
-            df['open_trails'] = pd.to_numeric(df['open_trails'], errors='coerce').fillna(0).astype(int)
-            df['total_trails'] = pd.to_numeric(df['total_trails'], errors='coerce').fillna(0).astype(int)
+        # Parse lifts into separate columns
+        if 'lifts_open' in df.columns:
+            df[['open_lifts', 'total_lifts']] = df['lifts_open'].str.extract(r'(\d+)/(\d+)')
+            df['open_lifts'] = pd.to_numeric(df['open_lifts'], errors='coerce').fillna(0).astype(int)
+            df['total_lifts'] = pd.to_numeric(df['total_lifts'], errors='coerce').fillna(0).astype(int)
         
-        # Ensure snow is numeric
-        df['new_snow_24h'] = pd.to_numeric(df['new_snow_24h'], errors='coerce').fillna(0).astype(int)
+        # Ensure snow fields are numeric
+        for col in ['new_snow_24h', 'new_snow_48h', 'mid_mtn_depth']:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
         
         # Sort by name
         df = df.sort_values('name').reset_index(drop=True)
