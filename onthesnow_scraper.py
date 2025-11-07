@@ -127,66 +127,67 @@ class OnTheSnowScraper:
         return resorts
     
     def _extract_resort_from_row(self, cells, row):
-        """Extract resort data from table row"""
+        """Extract resort data from table row - OnTheSnow specific structure"""
         try:
-            # Get resort name - usually first cell or contains a link
-            name = None
-            for cell in cells[:2]:  # Check first 2 cells for name
-                text = cell.get_text(strip=True)
-                link = cell.find('a')
-                if link:
-                    name = link.get_text(strip=True)
-                    break
-                elif text and len(text) > 3 and not text.isdigit():
-                    name = text
-                    break
-            
-            if not name or len(name) < 3:
+            if not cells or len(cells) < 2:
                 return None
             
+            # First cell contains resort name
+            first_cell = cells[0]
+            
+            # Find the resort name span (class="h4 styles_h4__x3zzi")
+            name_span = first_cell.find('span', class_=lambda x: x and 'h4' in x and 'styles_h4' in x)
+            if not name_span:
+                return None
+            
+            name = name_span.get_text(strip=True)
+            
             # Filter out header rows
-            if name.lower() in ['resort', 'name', 'location', 'open', 'closed']:
+            if not name or len(name) < 3:
+                return None
+            if name.lower() in ['resort', 'name', 'location', 'open', 'closed', 'resort name']:
                 return None
             
             resort = {'name': name}
             
-            # Extract numeric data from remaining cells
-            data_cells = [cell.get_text(strip=True) for cell in cells]
+            # Check table type by counting cells
+            # Open table: 6 cols (name, 24h, 3day, base, trails, lifts)
+            # Closed table: 2 cols (name, opening date)
             
-            # Try to find snow/depth/lift data
-            for cell_text in data_cells:
-                # Look for snow amounts (e.g., "5\"", "0-1\"", "18\"")
-                if '"' in cell_text or 'in' in cell_text.lower():
-                    inches = self._parse_measurement(cell_text)
-                    if 'new_snow_24h' not in resort:
-                        resort['new_snow_24h'] = inches
-                    elif 'new_snow_48h' not in resort:
-                        resort['new_snow_48h'] = inches
-                    elif 'base_depth' not in resort:
-                        resort['base_depth'] = inches
-                
-                # Look for lift/trail counts (e.g., "4/140", "5/23")
-                if '/' in cell_text and re.match(r'\d+/\d+', cell_text):
-                    if 'lifts_open' not in resort:
-                        resort['lifts_open'] = cell_text
-                    elif 'trails_open' not in resort:
-                        resort['trails_open'] = cell_text
-            
-            # Get status from row or cells
-            status_text = row.get_text().lower()
-            if 'open' in status_text and 'opens' not in status_text:
+            if len(cells) >= 6:
+                # OPEN RESORT - has full data
                 resort['status'] = 'Open'
-            elif 'closed' in status_text or 'opens' in status_text:
-                resort['status'] = 'Closed'
+                
+                # Column 1: 24h snowfall
+                snow_24h_span = cells[1].find('span', class_=lambda x: x and 'h4' in x)
+                resort['new_snow_24h'] = self._parse_measurement(snow_24h_span.get_text(strip=True)) if snow_24h_span else 0
+                
+                # Column 2: 3-day forecast (use as 48h)
+                snow_forecast_span = cells[2].find('span', class_=lambda x: x and 'h4' in x)
+                resort['new_snow_48h'] = self._parse_measurement(snow_forecast_span.get_text(strip=True)) if snow_forecast_span else 0
+                
+                # Column 3: Base depth
+                base_span = cells[3].find('span', class_=lambda x: x and 'h4' in x)
+                resort['base_depth'] = self._parse_measurement(base_span.get_text(strip=True)) if base_span else 0
+                
+                # Column 4: Trails open (format: "4/140")
+                trails_span = cells[4].find('span', class_=lambda x: x and 'h4' in x)
+                trails_text = trails_span.get_text(strip=True) if trails_span else '0/0'
+                resort['trails_open'] = trails_text
+                
+                # Column 5: Lifts open (format: "4/21")
+                lifts_span = cells[5].find('span', class_=lambda x: x and 'h4' in x)
+                lifts_text = lifts_span.get_text(strip=True) if lifts_span else '0/0'
+                resort['lifts_open'] = lifts_text
+                
             else:
-                resort['status'] = 'Unknown'
-            
-            # Set defaults for missing fields
-            resort.setdefault('new_snow_24h', 0)
-            resort.setdefault('new_snow_48h', 0)
-            resort.setdefault('base_depth', 0)
-            resort.setdefault('lifts_open', '0/0')
-            resort.setdefault('trails_open', '0/0')
+                # CLOSED RESORT - just name and opening date
+                resort['status'] = 'Closed'
+                resort['new_snow_24h'] = 0
+                resort['new_snow_48h'] = 0
+                resort['base_depth'] = 0
+                resort['trails_open'] = '0/0'
+                resort['lifts_open'] = '0/0'
             
             return resort
             
