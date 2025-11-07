@@ -292,7 +292,17 @@ def main():
         logger.info(f"{'='*70}")
         logger.info(f"Total resorts: {len(df)}")
         logger.info(f"\nFirst 10 resorts:")
-        print(df[['name', 'new_snow_24h', 'open_trails', 'total_trails', 'conditions']].head(10).to_string())
+        
+        # Use columns that actually exist
+        display_cols = []
+        for col in ['name', 'new_snow_24h', 'open_lifts', 'total_lifts', 'surface_conditions']:
+            if col in df.columns:
+                display_cols.append(col)
+        
+        if display_cols:
+            print(df[display_cols].head(10).to_string())
+        else:
+            print(df.head(10).to_string())
         
         # Check for resorts with snow
         with_snow = df[df['new_snow_24h'] > 0]
