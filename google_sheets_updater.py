@@ -49,6 +49,15 @@ class GoogleSheetsUpdater:
         
         if not self.credentials_json:
             raise ValueError("GOOGLE_CREDENTIALS not set")
+        
+        # Debug logging (don't log actual credentials, just metadata)
+        logger.info(f"Spreadsheet ID length: {len(str(self.spreadsheet_id))}")
+        logger.info(f"Credentials type: {type(self.credentials_json)}")
+        logger.info(f"Credentials length: {len(str(self.credentials_json))}")
+        
+        # Check if credentials is just whitespace
+        if isinstance(self.credentials_json, str) and not self.credentials_json.strip():
+            raise ValueError("GOOGLE_CREDENTIALS is empty or only whitespace")
     
     def authenticate(self):
         """Authenticate with Google Sheets API using service account"""
@@ -57,7 +66,24 @@ class GoogleSheetsUpdater:
             
             # Parse credentials JSON
             if isinstance(self.credentials_json, str):
-                credentials_dict = json.loads(self.credentials_json)
+                # Clean up the JSON string (remove extra quotes, whitespace, newlines)
+                cleaned = self.credentials_json.strip()
+                
+                # Remove surrounding quotes if present (common when pasting into GitHub secrets)
+                if cleaned.startswith("'") and cleaned.endswith("'"):
+                    cleaned = cleaned[1:-1]
+                if cleaned.startswith('"') and cleaned.endswith('"'):
+                    cleaned = cleaned[1:-1]
+                
+                # Log the first few characters for debugging (don't log the whole thing!)
+                logger.info(f"Parsing credentials JSON (starts with: {cleaned[:50]}...)")
+                
+                try:
+                    credentials_dict = json.loads(cleaned)
+                except json.JSONDecodeError as e:
+                    logger.error(f"Failed to parse JSON. Length: {len(cleaned)}, First 100 chars: {cleaned[:100]}")
+                    logger.error(f"JSON error: {e}")
+                    raise
             else:
                 credentials_dict = self.credentials_json
             
