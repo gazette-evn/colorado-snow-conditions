@@ -115,6 +115,59 @@ def add_resort_data(df):
     return df
 
 
+def add_missing_major_resorts(df):
+    """Add major resorts that aren't scraped yet but should appear on the map"""
+    
+    # Major resorts to always include (even if closed/not scraped)
+    must_include = ['Vail', 'Beaver Creek', 'Crested Butte', 'Wolf Creek']
+    
+    existing_names = df['name'].str.lower().tolist()
+    existing_normalized = [name.replace(' ski area', '').replace(' resort', '').replace(' mountain', '').strip() 
+                          for name in existing_names]
+    
+    missing_resorts = []
+    
+    for resort_name in must_include:
+        # Check if resort is already in the data (by normalized name)
+        resort_normalized = resort_name.lower()
+        if not any(resort_normalized in existing for existing in existing_normalized):
+            # Resort is missing - add it as placeholder
+            if resort_name in RESORT_DATA:
+                data = RESORT_DATA[resort_name]
+                missing_resorts.append({
+                    'name': resort_name,
+                    'status': 'Closed',
+                    'new_snow_24h': 0,
+                    'new_snow_48h': 0,
+                    'base_depth': 0,
+                    'trails_open': '0/0',
+                    'lifts_open': '0/0',
+                    'data_fetched_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'source': 'Manual Entry',
+                    'open_lifts': 0,
+                    'total_lifts': data['total_lifts'],
+                    'open_trails': 0,
+                    'total_trails': data['total_trails'],
+                    'mid_mtn_depth': 0,
+                    'surface_conditions': '',
+                    'name_lower': resort_name.lower(),
+                    'latitude': data['lat'],
+                    'longitude': data['lng'],
+                    'trails_open_pct': 0.0,
+                    'lifts_open_pct': 0.0,
+                })
+                logger.info(f"  + Added placeholder for {resort_name} ({data['total_trails']} trails)")
+    
+    if missing_resorts:
+        missing_df = pd.DataFrame(missing_resorts)
+        df = pd.concat([df, missing_df], ignore_index=True)
+        logger.info(f"✅ Added {len(missing_resorts)} missing major resorts")
+    else:
+        logger.info("✅ All major resorts already present")
+    
+    return df
+
+
 def combine_resort_data():
     """
     Scrape from both sources and combine
@@ -181,12 +234,30 @@ def combine_resort_data():
     
     combined_df = pd.concat(all_resorts, ignore_index=True)
     
-    # Remove duplicate resorts (keep first occurrence = OnTheSnow priority)
-    combined_df = combined_df.drop_duplicates(subset=['name'], keep='first')
+    # Remove duplicate resorts with better deduplication logic
+    # Handle A-Basin appearing as both "Arapahoe Basin" and "Arapahoe Basin Ski Area"
+    def normalize_name(name):
+        """Normalize resort names for duplicate detection"""
+        name = name.lower().strip()
+        # Remove common suffixes
+        name = name.replace(' ski area', '').replace(' ski resort', '')
+        name = name.replace(' resort', '').replace(' mountain resort', '')
+        name = name.replace(' mountain', '')
+        return name
+    
+    combined_df['name_normalized'] = combined_df['name'].apply(normalize_name)
+    
+    # Remove duplicates, keeping OnTheSnow version (first occurrence)
+    combined_df = combined_df.drop_duplicates(subset=['name_normalized'], keep='first')
+    combined_df = combined_df.drop(columns=['name_normalized'])
     
     # 4. Add coordinates, trail counts, and calculate percentages
     logger.info("\n📍 Adding resort data (coordinates, trail counts, percentages)...")
     combined_df = add_resort_data(combined_df)
+    
+    # 5. Add missing major resorts (not yet scraped but should be shown)
+    logger.info("\n➕ Checking for missing major resorts...")
+    combined_df = add_missing_major_resorts(combined_df)
     
     # Sort by name
     combined_df = combined_df.sort_values('name').reset_index(drop=True)

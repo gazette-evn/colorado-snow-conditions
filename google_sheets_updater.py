@@ -9,6 +9,7 @@ import json
 import logging
 import pandas as pd
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -138,7 +139,7 @@ class GoogleSheetsUpdater:
                 'Open Lifts': df.get('open_lifts', 0),
                 'Lifts Open %': df.get('lifts_open_pct', 0),
                 'Data Source': df.get('source', ''),
-                'Last Updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                'Last Updated': datetime.now(ZoneInfo('America/Denver')).strftime('%Y-%m-%d %I:%M %p MST')
             })
             
             # Convert to list of lists for Sheets API
