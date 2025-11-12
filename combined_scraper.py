@@ -11,39 +11,40 @@ from datetime import datetime
 from onthesnow_scraper import OnTheSnowScraper
 from colorado_ski_scraper import ColoradoSkiScraper
 
-# Colorado resort coordinates (from original manual data + additions)
-RESORT_COORDINATES = {
-    'Arapahoe Basin': {'lat': 39.634108, 'lng': -105.87147},
-    'Arapahoe Basin Ski Area': {'lat': 39.634108, 'lng': -105.87147},  # Same as A-Basin
-    'Aspen Highlands': {'lat': 39.1820055, 'lng': -106.8564},
-    'Aspen Mountain': {'lat': 39.1862685, 'lng': -106.81821},
-    'Beaver Creek': {'lat': 39.6016505, 'lng': -106.53161},
-    'Breckenridge': {'lat': 39.4782643, 'lng': -106.07232},
-    'Buttermilk': {'lat': 39.2058029, 'lng': -106.86107},
-    'Cooper': {'lat': 39.3601951, 'lng': -106.30145},
-    'Copper Mountain': {'lat': 39.5004501, 'lng': -106.15578},
-    'Crested Butte': {'lat': 38.8991036, 'lng': -106.96576},
-    'Echo Mountain': {'lat': 39.6845817, 'lng': -105.51939},
-    'Eldora': {'lat': 39.9372203, 'lng': -105.58268},
-    'Granby Ranch': {'lat': 40.0446489, 'lng': -105.90633},
-    'Hesperus': {'lat': 37.2991673, 'lng': -108.05513},
-    'Howelsen Hill': {'lat': 40.4833683, 'lng': -106.83797},
-    'Kendall Mountain': {'lat': 37.8111854, 'lng': -107.65682},
-    'Keystone': {'lat': 39.5816989, 'lng': -105.94367},
-    'Loveland': {'lat': 39.6775332, 'lng': -105.90536},
-    'Loveland Ski Area': {'lat': 39.6775332, 'lng': -105.90536},  # Same as Loveland
-    'Monarch': {'lat': 38.5120635, 'lng': -106.33197},
-    'Powderhorn': {'lat': 39.0693741, 'lng': -108.15071},
-    'Purgatory': {'lat': 37.6276821, 'lng': -107.83761},
-    'Purgatory Resort': {'lat': 37.6276821, 'lng': -107.83761},  # Same as Purgatory
-    'Silverton': {'lat': 37.884608, 'lng': -107.66592},
-    'Snowmass': {'lat': 39.2130418, 'lng': -106.93782},
-    'Steamboat': {'lat': 40.4537983, 'lng': -106.77088},
-    'Sunlight': {'lat': 39.3997821, 'lng': -107.33876},
-    'Telluride': {'lat': 37.9166674, 'lng': -107.83748},
-    'Vail': {'lat': 39.6061444, 'lng': -106.35497},
-    'Winter Park': {'lat': 39.8627761, 'lng': -105.77874},
-    'Wolf Creek': {'lat': 37.4717059, 'lng': -106.78829},
+# Colorado resort coordinates and trail counts
+# Coordinates from original manual data, trail counts from resort websites/SkiAreaStats
+RESORT_DATA = {
+    'Arapahoe Basin': {'lat': 39.634108, 'lng': -105.87147, 'total_trails': 147, 'total_lifts': 9},
+    'Arapahoe Basin Ski Area': {'lat': 39.634108, 'lng': -105.87147, 'total_trails': 147, 'total_lifts': 9},
+    'Aspen Highlands': {'lat': 39.1820055, 'lng': -106.8564, 'total_trails': 144, 'total_lifts': 5},
+    'Aspen Mountain': {'lat': 39.1862685, 'lng': -106.81821, 'total_trails': 76, 'total_lifts': 8},
+    'Beaver Creek': {'lat': 39.6016505, 'lng': -106.53161, 'total_trails': 150, 'total_lifts': 25},
+    'Breckenridge': {'lat': 39.4782643, 'lng': -106.07232, 'total_trails': 187, 'total_lifts': 35},
+    'Buttermilk': {'lat': 39.2058029, 'lng': -106.86107, 'total_trails': 44, 'total_lifts': 8},
+    'Cooper': {'lat': 39.3601951, 'lng': -106.30145, 'total_trails': 60, 'total_lifts': 5},
+    'Copper Mountain': {'lat': 39.5004501, 'lng': -106.15578, 'total_trails': 150, 'total_lifts': 24},
+    'Crested Butte': {'lat': 38.8991036, 'lng': -106.96576, 'total_trails': 121, 'total_lifts': 16},
+    'Echo Mountain': {'lat': 39.6845817, 'lng': -105.51939, 'total_trails': 7, 'total_lifts': 3},
+    'Eldora': {'lat': 39.9372203, 'lng': -105.58268, 'total_trails': 53, 'total_lifts': 12},
+    'Granby Ranch': {'lat': 40.0446489, 'lng': -105.90633, 'total_trails': 33, 'total_lifts': 5},
+    'Hesperus': {'lat': 37.2991673, 'lng': -108.05513, 'total_trails': 26, 'total_lifts': 2},
+    'Howelsen Hill': {'lat': 40.4833683, 'lng': -106.83797, 'total_trails': 15, 'total_lifts': 3},
+    'Kendall Mountain': {'lat': 37.8111854, 'lng': -107.65682, 'total_trails': 7, 'total_lifts': 2},
+    'Keystone': {'lat': 39.5816989, 'lng': -105.94367, 'total_trails': 131, 'total_lifts': 21},
+    'Loveland': {'lat': 39.6775332, 'lng': -105.90536, 'total_trails': 94, 'total_lifts': 10},
+    'Loveland Ski Area': {'lat': 39.6775332, 'lng': -105.90536, 'total_trails': 94, 'total_lifts': 10},
+    'Monarch': {'lat': 38.5120635, 'lng': -106.33197, 'total_trails': 64, 'total_lifts': 7},
+    'Powderhorn': {'lat': 39.0693741, 'lng': -108.15071, 'total_trails': 42, 'total_lifts': 4},
+    'Purgatory': {'lat': 37.6276821, 'lng': -107.83761, 'total_trails': 105, 'total_lifts': 11},
+    'Purgatory Resort': {'lat': 37.6276821, 'lng': -107.83761, 'total_trails': 105, 'total_lifts': 11},
+    'Silverton': {'lat': 37.884608, 'lng': -107.66592, 'total_trails': 69, 'total_lifts': 2},
+    'Snowmass': {'lat': 39.2130418, 'lng': -106.93782, 'total_trails': 98, 'total_lifts': 21},
+    'Steamboat': {'lat': 40.4537983, 'lng': -106.77088, 'total_trails': 169, 'total_lifts': 18},
+    'Sunlight': {'lat': 39.3997821, 'lng': -107.33876, 'total_trails': 71, 'total_lifts': 4},
+    'Telluride': {'lat': 37.9166674, 'lng': -107.83748, 'total_trails': 148, 'total_lifts': 19},
+    'Vail': {'lat': 39.6061444, 'lng': -106.35497, 'total_trails': 195, 'total_lifts': 31},
+    'Winter Park': {'lat': 39.8627761, 'lng': -105.77874, 'total_trails': 166, 'total_lifts': 24},
+    'Wolf Creek': {'lat': 37.4717059, 'lng': -106.78829, 'total_trails': 77, 'total_lifts': 7},
 }
 
 # Setup logging
@@ -58,37 +59,57 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def add_coordinates(df):
-    """Add latitude and longitude to resorts based on name matching"""
+def add_resort_data(df):
+    """Add latitude, longitude, trail counts, and lift counts to resorts"""
     
-    def find_coordinates(name):
-        """Find coordinates for a resort by name"""
+    def find_resort_data(name):
+        """Find complete resort data by name"""
         name_clean = name.strip().lower()
         
         # Try exact match first
-        if name in RESORT_COORDINATES:
-            coords = RESORT_COORDINATES[name]
-            return pd.Series([coords['lat'], coords['lng']])
+        if name in RESORT_DATA:
+            data = RESORT_DATA[name]
+            return pd.Series([data['lat'], data['lng'], data['total_trails'], data['total_lifts']])
         
         # Try partial matching
-        for resort_name, coords in RESORT_COORDINATES.items():
+        for resort_name, data in RESORT_DATA.items():
             if resort_name.lower() in name_clean or name_clean in resort_name.lower():
-                return pd.Series([coords['lat'], coords['lng']])
+                return pd.Series([data['lat'], data['lng'], data['total_trails'], data['total_lifts']])
         
         # No match found
-        logger.warning(f"⚠️ No coordinates found for: {name}")
-        return pd.Series([None, None])
+        logger.warning(f"⚠️ No resort data found for: {name}")
+        return pd.Series([None, None, None, None])
     
-    df[['latitude', 'longitude']] = df['name'].apply(find_coordinates)
+    # Add coordinates and trail/lift totals
+    df[['latitude', 'longitude', 'total_trails_manual', 'total_lifts_manual']] = df['name'].apply(find_resort_data)
+    
+    # Fill in missing total_trails and total_lifts from manual data
+    df['total_trails'] = df['total_trails'].fillna(df['total_trails_manual'])
+    df['total_lifts'] = df['total_lifts'].fillna(df['total_lifts_manual'])
+    
+    # Drop the temporary manual columns
+    df = df.drop(columns=['total_trails_manual', 'total_lifts_manual'], errors='ignore')
+    
+    # Calculate percentages
+    df['trails_open_pct'] = 0.0
+    df['lifts_open_pct'] = 0.0
+    
+    # Calculate trails open percentage
+    valid_trails = (df['total_trails'].notna()) & (df['total_trails'] > 0) & (df['open_trails'].notna())
+    df.loc[valid_trails, 'trails_open_pct'] = (df.loc[valid_trails, 'open_trails'] / df.loc[valid_trails, 'total_trails'] * 100).round(1)
+    
+    # Calculate lifts open percentage
+    valid_lifts = (df['total_lifts'].notna()) & (df['total_lifts'] > 0) & (df['open_lifts'].notna())
+    df.loc[valid_lifts, 'lifts_open_pct'] = (df.loc[valid_lifts, 'open_lifts'] / df.loc[valid_lifts, 'total_lifts'] * 100).round(1)
     
     # Log resorts without coordinates
     missing = df[df['latitude'].isna()]
     if len(missing) > 0:
-        logger.warning(f"Missing coordinates for {len(missing)} resorts:")
+        logger.warning(f"Missing data for {len(missing)} resorts:")
         for name in missing['name']:
             logger.warning(f"  - {name}")
     else:
-        logger.info(f"✅ Added coordinates to all {len(df)} resorts")
+        logger.info(f"✅ Added complete data to all {len(df)} resorts")
     
     return df
 
@@ -162,9 +183,9 @@ def combine_resort_data():
     # Remove duplicate resorts (keep first occurrence = OnTheSnow priority)
     combined_df = combined_df.drop_duplicates(subset=['name'], keep='first')
     
-    # 4. Add coordinates
-    logger.info("\n📍 Adding resort coordinates...")
-    combined_df = add_coordinates(combined_df)
+    # 4. Add coordinates, trail counts, and calculate percentages
+    logger.info("\n📍 Adding resort data (coordinates, trail counts, percentages)...")
+    combined_df = add_resort_data(combined_df)
     
     # Sort by name
     combined_df = combined_df.sort_values('name').reset_index(drop=True)

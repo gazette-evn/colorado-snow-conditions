@@ -131,12 +131,12 @@ class GoogleSheetsUpdater:
                 'Base Depth (in)': df.get('base_depth', 0).apply(clean_numeric),
                 'Mid-Mtn Depth (in)': df.get('mid_mtn_depth', 0).apply(clean_numeric),
                 'Surface Conditions': df.get('surface_conditions', ''),
-                'Lifts Open': df.get('lifts_open', '0/0'),
-                'Open Lifts': df.get('open_lifts', 0),
-                'Total Lifts': df.get('total_lifts', 0),
-                'Trails Open': df.get('trails_open', '0/0'),
-                'Open Trails': df.get('open_trails', 0),
                 'Total Trails': df.get('total_trails', 0),
+                'Open Trails': df.get('open_trails', 0),
+                'Trails Open %': df.get('trails_open_pct', 0),
+                'Total Lifts': df.get('total_lifts', 0),
+                'Open Lifts': df.get('open_lifts', 0),
+                'Lifts Open %': df.get('lifts_open_pct', 0),
                 'Data Source': df.get('source', ''),
                 'Last Updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             })
