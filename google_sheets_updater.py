@@ -139,7 +139,7 @@ class GoogleSheetsUpdater:
                 'Open Lifts': df.get('open_lifts', 0),
                 'Lifts Open %': df.get('lifts_open_pct', 0),
                 'Data Source': df.get('source', ''),
-                'Last Updated': datetime.now(ZoneInfo('America/Denver')).strftime('%Y-%m-%d %I:%M %p MST')
+                'Last Updated': datetime.now(ZoneInfo('America/Denver')).strftime('%Y-%m-%d %H:%M')
             })
             
             # Convert to list of lists for Sheets API
