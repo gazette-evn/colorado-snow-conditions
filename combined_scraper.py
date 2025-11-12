@@ -12,39 +12,40 @@ from onthesnow_scraper import OnTheSnowScraper
 from colorado_ski_scraper import ColoradoSkiScraper
 
 # Colorado resort coordinates and trail counts
-# Coordinates from original manual data, trail counts from resort websites/SkiAreaStats
+# Trail counts from user's manual data CSV (Colorado Ski Area Data - Sheet1.csv)
+# Lift counts estimated from resort data
 RESORT_DATA = {
     'Arapahoe Basin': {'lat': 39.634108, 'lng': -105.87147, 'total_trails': 147, 'total_lifts': 9},
     'Arapahoe Basin Ski Area': {'lat': 39.634108, 'lng': -105.87147, 'total_trails': 147, 'total_lifts': 9},
-    'Aspen Highlands': {'lat': 39.1820055, 'lng': -106.8564, 'total_trails': 144, 'total_lifts': 5},
-    'Aspen Mountain': {'lat': 39.1862685, 'lng': -106.81821, 'total_trails': 76, 'total_lifts': 8},
-    'Beaver Creek': {'lat': 39.6016505, 'lng': -106.53161, 'total_trails': 150, 'total_lifts': 25},
-    'Breckenridge': {'lat': 39.4782643, 'lng': -106.07232, 'total_trails': 187, 'total_lifts': 35},
+    'Aspen Highlands': {'lat': 39.1820055, 'lng': -106.8564, 'total_trails': 116, 'total_lifts': 5},
+    'Aspen Mountain': {'lat': 39.1862685, 'lng': -106.81821, 'total_trails': 104, 'total_lifts': 8},
+    'Beaver Creek': {'lat': 39.6016505, 'lng': -106.53161, 'total_trails': 176, 'total_lifts': 25},
+    'Breckenridge': {'lat': 39.4782643, 'lng': -106.07232, 'total_trails': 193, 'total_lifts': 35},
     'Buttermilk': {'lat': 39.2058029, 'lng': -106.86107, 'total_trails': 44, 'total_lifts': 8},
-    'Cooper': {'lat': 39.3601951, 'lng': -106.30145, 'total_trails': 60, 'total_lifts': 5},
-    'Copper Mountain': {'lat': 39.5004501, 'lng': -106.15578, 'total_trails': 150, 'total_lifts': 24},
-    'Crested Butte': {'lat': 38.8991036, 'lng': -106.96576, 'total_trails': 121, 'total_lifts': 16},
+    'Cooper': {'lat': 39.3601951, 'lng': -106.30145, 'total_trails': 65, 'total_lifts': 5},
+    'Copper Mountain': {'lat': 39.5004501, 'lng': -106.15578, 'total_trails': 159, 'total_lifts': 24},
+    'Crested Butte': {'lat': 38.8991036, 'lng': -106.96576, 'total_trails': 168, 'total_lifts': 16},
     'Echo Mountain': {'lat': 39.6845817, 'lng': -105.51939, 'total_trails': 7, 'total_lifts': 3},
-    'Eldora': {'lat': 39.9372203, 'lng': -105.58268, 'total_trails': 53, 'total_lifts': 12},
-    'Granby Ranch': {'lat': 40.0446489, 'lng': -105.90633, 'total_trails': 33, 'total_lifts': 5},
+    'Eldora': {'lat': 39.9372203, 'lng': -105.58268, 'total_trails': 62, 'total_lifts': 12},
+    'Granby Ranch': {'lat': 40.0446489, 'lng': -105.90633, 'total_trails': 54, 'total_lifts': 5},
     'Hesperus': {'lat': 37.2991673, 'lng': -108.05513, 'total_trails': 26, 'total_lifts': 2},
-    'Howelsen Hill': {'lat': 40.4833683, 'lng': -106.83797, 'total_trails': 15, 'total_lifts': 3},
+    'Howelsen Hill': {'lat': 40.4833683, 'lng': -106.83797, 'total_trails': 17, 'total_lifts': 3},
     'Kendall Mountain': {'lat': 37.8111854, 'lng': -107.65682, 'total_trails': 7, 'total_lifts': 2},
-    'Keystone': {'lat': 39.5816989, 'lng': -105.94367, 'total_trails': 131, 'total_lifts': 21},
+    'Keystone': {'lat': 39.5816989, 'lng': -105.94367, 'total_trails': 142, 'total_lifts': 21},
     'Loveland': {'lat': 39.6775332, 'lng': -105.90536, 'total_trails': 94, 'total_lifts': 10},
     'Loveland Ski Area': {'lat': 39.6775332, 'lng': -105.90536, 'total_trails': 94, 'total_lifts': 10},
-    'Monarch': {'lat': 38.5120635, 'lng': -106.33197, 'total_trails': 64, 'total_lifts': 7},
-    'Powderhorn': {'lat': 39.0693741, 'lng': -108.15071, 'total_trails': 42, 'total_lifts': 4},
-    'Purgatory': {'lat': 37.6276821, 'lng': -107.83761, 'total_trails': 105, 'total_lifts': 11},
-    'Purgatory Resort': {'lat': 37.6276821, 'lng': -107.83761, 'total_trails': 105, 'total_lifts': 11},
-    'Silverton': {'lat': 37.884608, 'lng': -107.66592, 'total_trails': 69, 'total_lifts': 2},
+    'Monarch': {'lat': 38.5120635, 'lng': -106.33197, 'total_trails': 67, 'total_lifts': 7},
+    'Powderhorn': {'lat': 39.0693741, 'lng': -108.15071, 'total_trails': 57, 'total_lifts': 4},
+    'Purgatory': {'lat': 37.6276821, 'lng': -107.83761, 'total_trails': 107, 'total_lifts': 11},
+    'Purgatory Resort': {'lat': 37.6276821, 'lng': -107.83761, 'total_trails': 107, 'total_lifts': 11},
+    'Silverton': {'lat': 37.884608, 'lng': -107.66592, 'total_trails': 0, 'total_lifts': 2},  # No trail count in manual data
     'Snowmass': {'lat': 39.2130418, 'lng': -106.93782, 'total_trails': 98, 'total_lifts': 21},
-    'Steamboat': {'lat': 40.4537983, 'lng': -106.77088, 'total_trails': 169, 'total_lifts': 18},
-    'Sunlight': {'lat': 39.3997821, 'lng': -107.33876, 'total_trails': 71, 'total_lifts': 4},
-    'Telluride': {'lat': 37.9166674, 'lng': -107.83748, 'total_trails': 148, 'total_lifts': 19},
-    'Vail': {'lat': 39.6061444, 'lng': -106.35497, 'total_trails': 195, 'total_lifts': 31},
-    'Winter Park': {'lat': 39.8627761, 'lng': -105.77874, 'total_trails': 166, 'total_lifts': 24},
-    'Wolf Creek': {'lat': 37.4717059, 'lng': -106.78829, 'total_trails': 77, 'total_lifts': 7},
+    'Steamboat': {'lat': 40.4537983, 'lng': -106.77088, 'total_trails': 184, 'total_lifts': 18},
+    'Sunlight': {'lat': 39.3997821, 'lng': -107.33876, 'total_trails': 77, 'total_lifts': 4},
+    'Telluride': {'lat': 37.9166674, 'lng': -107.83748, 'total_trails': 149, 'total_lifts': 19},
+    'Vail': {'lat': 39.6061444, 'lng': -106.35497, 'total_trails': 277, 'total_lifts': 31},
+    'Winter Park': {'lat': 39.8627761, 'lng': -105.77874, 'total_trails': 171, 'total_lifts': 24},
+    'Wolf Creek': {'lat': 37.4717059, 'lng': -106.78829, 'total_trails': 133, 'total_lifts': 7},
 }
 
 # Setup logging
