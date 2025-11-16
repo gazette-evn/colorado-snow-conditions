@@ -23,9 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
 function initMap() {
     map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/outdoors-v12', // Terrain style
-        center: [-106.5, 39.0], // Center of Colorado
-        zoom: 6.5,
+        style: MAP_CONFIG.style,
+        center: MAP_CONFIG.center,
+        zoom: MAP_CONFIG.zoom,
+        minZoom: MAP_CONFIG.minZoom,
+        maxZoom: MAP_CONFIG.maxZoom,
         pitch: 0
     });
     
@@ -179,27 +181,62 @@ function renderMarkers() {
         // Store original size for hover effect
         el.dataset.originalSize = size;
         
-        // Hover effects
-        el.addEventListener('mouseenter', () => {
-            const newSize = size * 1.2;
-            el.style.width = `${newSize}px`;
-            el.style.height = `${newSize}px`;
-            el.style.boxShadow = '0 4px 16px rgba(0,0,0,0.5)';
-        });
-        
-        el.addEventListener('mouseleave', () => {
-            el.style.width = `${size}px`;
-            el.style.height = `${size}px`;
-            el.style.boxShadow = '0 3px 12px rgba(0,0,0,0.4)';
-        });
-        
-        // Create popup
+        // Create popup first (before event listeners reference it)
         const popup = new mapboxgl.Popup({
             offset: 25,
             closeButton: true,
             closeOnClick: false,
             maxWidth: '320px'
         }).setHTML(createPopupHTML(resort));
+        
+        // Track if popup is pinned (clicked)
+        let isPinned = false;
+        
+        // Hover effects - show popup on hover
+        el.addEventListener('mouseenter', () => {
+            const newSize = size * 1.2;
+            el.style.width = `${newSize}px`;
+            el.style.height = `${newSize}px`;
+            el.style.boxShadow = '0 4px 16px rgba(0,0,0,0.5)';
+            
+            // Show popup on hover if not already pinned
+            if (!isPinned) {
+                popup.addTo(map);
+            }
+        });
+        
+        el.addEventListener('mouseleave', () => {
+            el.style.width = `${size}px`;
+            el.style.height = `${size}px`;
+            el.style.boxShadow = '0 3px 12px rgba(0,0,0,0.4)';
+            
+            // Hide popup on mouse leave if not pinned
+            if (!isPinned) {
+                popup.remove();
+            }
+        });
+        
+        // Click to pin/unpin popup
+        el.addEventListener('click', (e) => {
+            e.stopPropagation();
+            
+            // Close all other popups and unpin them
+            markers.forEach(m => {
+                if (m !== marker) {
+                    m.getPopup().remove();
+                    const markerEl = m.getElement();
+                    markerEl._isPinned = false;
+                }
+            });
+            
+            // Toggle this popup's pinned state
+            isPinned = !isPinned;
+            el._isPinned = isPinned;
+            
+            if (isPinned) {
+                popup.addTo(map);
+            }
+        });
         
         // Create and add marker with anchor set to center
         const marker = new mapboxgl.Marker({
