@@ -36,6 +36,40 @@ function initMap() {
     
     // Add fullscreen control
     map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
+    
+    // Enhance highway visibility on light basemap when map loads
+    map.on('load', () => {
+        // Make highways more visible with high-viz colors
+        const highwayLayers = [
+            'road-motorway-trunk',
+            'road-motorway',
+            'road-primary',
+            'road-secondary-tertiary'
+        ];
+        
+        highwayLayers.forEach(layerId => {
+            if (map.getLayer(layerId)) {
+                map.setPaintProperty(layerId, 'line-color', [
+                    'match',
+                    ['get', 'class'],
+                    'motorway', '#FF6B35',      // Bright orange for interstates
+                    'trunk', '#FF8C42',         // Orange for major highways
+                    'primary', '#FFA500',       // Orange for primary roads
+                    '#CCCCCC'                   // Default grey
+                ]);
+                
+                // Make highways thicker and more visible
+                map.setPaintProperty(layerId, 'line-width', [
+                    'interpolate',
+                    ['exponential', 1.5],
+                    ['zoom'],
+                    5, 2,   // Thicker at low zoom
+                    10, 4,  // Even thicker when zoomed in
+                    15, 8
+                ]);
+            }
+        });
+    });
 }
 
 function setupEventListeners() {
@@ -169,7 +203,7 @@ function renderMarkers() {
         
         // Calculate stroke color based on status
         const isOpen = resort.Status === 'Open';
-        const strokeColor = isOpen ? '#2E7D32' : '#9E9E9E';  // Green for open, grey for closed
+        const strokeColor = isOpen ? STROKE_COLORS.open : STROKE_COLORS.closed;
         
         // Create marker element with fixed positioning
         const el = document.createElement('div');
@@ -274,17 +308,17 @@ function calculateMarkerSize(totalTrails) {
 }
 
 function getColorForPercentage(percent, status) {
-    // Color scale for trails open percentage
+    // Modern color scale - uses Google Material colors for sharp, contemporary look
     if (status === 'Closed' || percent === 0) {
-        return '#BDBDBD'; // Gray for closed
+        return COLOR_SCALE.closed;  // Very light grey
     } else if (percent < 5) {
-        return '#90CAF9'; // Light blue (just opened)
+        return COLOR_SCALE.veryLow;  // Blue (early season)
     } else if (percent < 25) {
-        return '#66BB6A'; // Light green
+        return COLOR_SCALE.low;  // Green (building)
     } else if (percent < 50) {
-        return '#43A047'; // Medium green
+        return COLOR_SCALE.medium;  // Yellow (moderate)
     } else {
-        return '#2E7D32'; // Dark green (mostly open)
+        return COLOR_SCALE.high;  // Red/orange (peak)
     }
 }
 

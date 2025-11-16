@@ -17,16 +17,23 @@ const MAP_CONFIG = {
     zoom: 6.5,
     minZoom: 5,
     maxZoom: 12,
-    style: 'mapbox://styles/mapbox/streets-v12', // Streets with highways in high-viz colors
+    // Light style with visible roads - clean and modern
+    style: 'mapbox://styles/mapbox/light-v11',
 };
 
-// Color scheme (trails open percentage)
+// Modern, sharp color scheme inspired by contemporary data viz
 const COLOR_SCALE = {
-    closed: '#BDBDBD',      // Gray
-    veryLow: '#90CAF9',     // Light blue (1-5%)
-    low: '#66BB6A',         // Light green (6-25%)
-    medium: '#43A047',      // Medium green (26-50%)
-    high: '#2E7D32',        // Dark green (51-100%)
+    closed: '#E8EAED',      // Very light grey (almost white) - minimal visual weight
+    veryLow: '#4285F4',     // Google blue - vibrant but professional (1-5%)
+    low: '#34A853',         // Google green - fresh and modern (6-25%)
+    medium: '#FBBC04',      // Google yellow - energetic (26-50%)
+    high: '#EA4335',        // Google red/orange - high energy (51-100%)
+};
+
+// Stroke colors - contemporary and crisp
+const STROKE_COLORS = {
+    open: '#1A73E8',        // Bright blue - modern, high contrast
+    closed: '#BDC1C6',      // Medium grey - subtle but visible
 };
 
 // Marker sizing (based on total trails)
