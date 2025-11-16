@@ -24,12 +24,9 @@ function initMap() {
     // Detect if mobile/narrow screen
     const isMobile = window.innerWidth < 768;
     
-    // Add cache busting parameter to force style refresh when updated in Mapbox Studio
-    const styleUrl = MAP_CONFIG.style + '?fresh=' + Date.now();
-    
     map = new mapboxgl.Map({
         container: 'map',
-        style: styleUrl,
+        style: MAP_CONFIG.style,
         minZoom: MAP_CONFIG.minZoom,
         maxZoom: MAP_CONFIG.maxZoom,
         pitch: 0
