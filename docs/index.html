@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorado Snow Conditions - Live Map</title>
+    
+    <!-- Mapbox GL JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet" />
+    
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header>
+            <h1>🎿 Colorado Snow Conditions</h1>
+            <div class="controls">
+                <button id="filterOpen" class="filter-btn active">All Resorts</button>
+                <button id="filterClosed" class="filter-btn">Open Only</button>
+                <div class="last-update" id="lastUpdate">Loading...</div>
+            </div>
+        </header>
+
+        <!-- Map Container -->
+        <div id="map"></div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <h3>Trails Open</h3>
+            <div class="legend-scale">
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #BDBDBD;"></span>
+                    <span>Closed (0%)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #90CAF9;"></span>
+                    <span>1-5%</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #66BB6A;"></span>
+                    <span>6-25%</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #43A047;"></span>
+                    <span>26-50%</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #2E7D32;"></span>
+                    <span>51-100%</span>
+                </div>
+            </div>
+            <div class="legend-size">
+                <h4>Circle Size = Total Trails</h4>
+                <p class="legend-note">Larger circles = bigger resorts</p>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading resort data...</p>
+        </div>
+    </div>
+
+    <!-- Configuration -->
+    <script src="config.js"></script>
+    
+    <!-- Map Logic -->
+    <script src="map.js"></script>
+</body>
+</html>
+
