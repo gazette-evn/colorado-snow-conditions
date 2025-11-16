@@ -17,8 +17,8 @@ const MAP_CONFIG = {
     zoom: 6.5,
     minZoom: 5,
     maxZoom: 12,
-    // Streets style - has visible highways, we'll customize to make it cleaner
-    style: 'mapbox://styles/mapbox/streets-v12',
+    // Light grey basemap - already clean and minimal
+    style: 'mapbox://styles/mapbox/light-v11',
 };
 
 // Modern, sharp color scheme inspired by contemporary data viz

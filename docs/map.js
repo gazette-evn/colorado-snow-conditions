@@ -37,34 +37,8 @@ function initMap() {
     // Add fullscreen control
     map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
     
-    // Customize streets-v12 to be cleaner and more subtle
-    map.on('load', () => {
-        // Lighten the background to match light-v11 aesthetic
-        if (map.getLayer('land')) {
-            map.setPaintProperty('land', 'background-color', '#F5F5F5');
-        }
-        
-        // Reduce water saturation (make it more subtle grey-blue)
-        if (map.getLayer('water')) {
-            map.setPaintProperty('water', 'fill-color', '#D1E4F0');
-        }
-        
-        // Keep highways as-is (they're good in streets-v12)
-        // But reduce thickness slightly for cleaner look
-        const roadLayers = ['road-motorway-trunk', 'road-primary'];
-        roadLayers.forEach(layerId => {
-            if (map.getLayer(layerId)) {
-                map.setPaintProperty(layerId, 'line-width', [
-                    'interpolate',
-                    ['exponential', 1.5],
-                    ['zoom'],
-                    5, 1.5,   // Thinner at distance
-                    8, 2.5,
-                    12, 4
-                ]);
-            }
-        });
-    });
+    // Use light-v11 as-is - it's already clean and roads are visible enough
+    // Focus on making the resort markers stand out instead of fighting with the basemap
 }
 
 function setupEventListeners() {
