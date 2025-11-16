@@ -19,17 +19,19 @@ body {
 
 /* Header Styles */
 header {
-    background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+    background: linear-gradient(135deg, #0D47A1 0%, #1565C0 100%);
     color: white;
-    padding: 1rem 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.2);
     z-index: 10;
+    position: relative;
 }
 
 header h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.5px;
 }
 
 .controls {
@@ -74,49 +76,57 @@ header h1 {
 /* Legend */
 .legend {
     position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    bottom: 30px;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(10px);
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     z-index: 1;
-    max-width: 200px;
+    max-width: 220px;
+    border: 1px solid rgba(0,0,0,0.08);
 }
 
 .legend h3 {
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #333;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: #1565C0;
+    border-bottom: 2px solid #E3F2FD;
+    padding-bottom: 0.5rem;
 }
 
 .legend h4 {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    margin: 0.75rem 0 0.25rem 0;
-    color: #666;
+    margin: 1rem 0 0.5rem 0;
+    color: #424242;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin: 0.25rem 0;
-    font-size: 0.75rem;
+    gap: 0.625rem;
+    margin: 0.4rem 0;
+    font-size: 0.8rem;
+    color: #424242;
 }
 
 .legend-color {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    flex-shrink: 0;
 }
 
 .legend-note {
-    font-size: 0.7rem;
-    color: #999;
-    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: #757575;
+    margin-top: 0.5rem;
+    font-style: italic;
 }
 
 /* Loading Indicator */
@@ -160,38 +170,68 @@ header h1 {
     font-size: 0.875rem;
 }
 
+/* Marker Styling */
+.marker {
+    display: block;
+    transform-origin: center center;
+}
+
+.mapboxgl-marker {
+    will-change: transform;
+}
+
 /* Mapbox Popup Customization */
+.mapboxgl-popup {
+    max-width: 320px;
+}
+
 .mapboxgl-popup-content {
-    padding: 1rem;
-    min-width: 250px;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    padding: 1.25rem;
+    min-width: 280px;
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+    font-family: inherit;
+}
+
+.mapboxgl-popup-close-button {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    color: #666;
+}
+
+.mapboxgl-popup-close-button:hover {
+    background: #F5F5F5;
+    color: #333;
 }
 
 .popup-header {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #333;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: #1565C0;
+    letter-spacing: -0.3px;
 }
 
 .popup-status {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .popup-status.open {
-    background: #C8E6C9;
-    color: #2E7D32;
+    background: linear-gradient(135deg, #66BB6A 0%, #43A047 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(67, 160, 71, 0.3);
 }
 
 .popup-status.closed {
-    background: #EEEEEE;
-    color: #757575;
+    background: #E0E0E0;
+    color: #616161;
 }
 
 .popup-section {
@@ -206,35 +246,40 @@ header h1 {
 }
 
 .popup-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    color: #999;
-    margin-bottom: 0.25rem;
-    font-weight: 600;
+    color: #1565C0;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .popup-data {
     display: flex;
     justify-content: space-between;
-    margin: 0.25rem 0;
-    font-size: 0.875rem;
+    margin: 0.4rem 0;
+    font-size: 0.9rem;
+    align-items: center;
 }
 
 .popup-data-label {
-    color: #666;
+    color: #616161;
+    font-weight: 500;
 }
 
 .popup-data-value {
-    font-weight: 600;
-    color: #333;
+    font-weight: 700;
+    color: #212121;
+    font-size: 0.95rem;
 }
 
 .popup-footer {
-    margin-top: 0.75rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid #EEEEEE;
-    font-size: 0.7rem;
-    color: #999;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #E0E0E0;
+    font-size: 0.75rem;
+    color: #757575;
+    line-height: 1.5;
 }
 
 /* Mobile Responsive */
