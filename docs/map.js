@@ -24,9 +24,12 @@ function initMap() {
     // Detect if mobile/narrow screen
     const isMobile = window.innerWidth < 768;
     
+    // Add cache busting parameter to force style refresh when updated in Mapbox Studio
+    const styleUrl = MAP_CONFIG.style + '?fresh=' + Date.now();
+    
     map = new mapboxgl.Map({
         container: 'map',
-        style: MAP_CONFIG.style,
+        style: styleUrl,
         minZoom: MAP_CONFIG.minZoom,
         maxZoom: MAP_CONFIG.maxZoom,
         pitch: 0
@@ -292,7 +295,7 @@ function renderMarkers() {
         
         // Fit to the resort bounds with generous padding
         map.fitBounds(bounds, {
-            padding: {top: 60, bottom: 180, left: 20, right: 20},  // Extra bottom padding for horizontal legend
+            padding: {top: 60, bottom: 120, left: 20, right: 20},  // Extra bottom padding for fixed horizontal legend bar
             duration: 1000
         });
     }
