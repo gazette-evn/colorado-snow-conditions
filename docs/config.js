@@ -32,15 +32,18 @@ const COLOR_SCALE = {
 
 // Stroke colors - contemporary and crisp
 const STROKE_COLORS = {
-    open: '#1A73E8',        // Bright blue - modern, high contrast
-    closed: '#BDC1C6',      // Medium grey - subtle but visible
+    open: '#F5F5F5',        // Almost white - clean, modern
+    closed: '#424242',      // Dark grey - strong contrast
 };
 
 // Marker sizing (based on total trails)
 const MARKER_SIZE = {
-    min: 12,    // Smallest resorts (7 trails)
-    max: 50,    // Largest resorts (277 trails)
+    min: 10,    // Smallest resorts (7 trails)
+    max: 40,    // Largest resorts (277 trails) - reduced for better visual balance
 };
+
+// Marker opacity
+const MARKER_OPACITY = 0.85;  // 85% opacity for fills (allows map to show through)
 
 // Auto-refresh interval (milliseconds)
 const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes

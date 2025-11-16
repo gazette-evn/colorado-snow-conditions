@@ -40,33 +40,45 @@ function initMap() {
     // Enhance highway visibility on light basemap when map loads
     map.on('load', () => {
         // Make highways more visible with high-viz colors
-        const highwayLayers = [
+        // Try multiple possible layer names (varies by Mapbox style)
+        const possibleLayers = [
             'road-motorway-trunk',
             'road-motorway',
             'road-primary',
-            'road-secondary-tertiary'
+            'road-simple',
+            'road-street',
+            'road',
+            'highway-motorway-trunk',
+            'highway-motorway'
         ];
         
-        highwayLayers.forEach(layerId => {
+        // Log available layers for debugging
+        const style = map.getStyle();
+        console.log('Available road layers:', 
+            style.layers.filter(l => l.id.includes('road') || l.id.includes('highway'))
+                       .map(l => l.id));
+        
+        // Apply high-viz styling to any road layers we find
+        possibleLayers.forEach(layerId => {
             if (map.getLayer(layerId)) {
-                map.setPaintProperty(layerId, 'line-color', [
-                    'match',
-                    ['get', 'class'],
-                    'motorway', '#FF6B35',      // Bright orange for interstates
-                    'trunk', '#FF8C42',         // Orange for major highways
-                    'primary', '#FFA500',       // Orange for primary roads
-                    '#CCCCCC'                   // Default grey
-                ]);
+                console.log(`Styling layer: ${layerId}`);
                 
-                // Make highways thicker and more visible
-                map.setPaintProperty(layerId, 'line-width', [
-                    'interpolate',
-                    ['exponential', 1.5],
-                    ['zoom'],
-                    5, 2,   // Thicker at low zoom
-                    10, 4,  // Even thicker when zoomed in
-                    15, 8
-                ]);
+                try {
+                    // Set bright colors for highways
+                    map.setPaintProperty(layerId, 'line-color', '#FF6B35');
+                    
+                    // Make them thicker
+                    map.setPaintProperty(layerId, 'line-width', [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        5, 2.5,
+                        8, 4,
+                        12, 6
+                    ]);
+                } catch (e) {
+                    console.log(`Could not style ${layerId}:`, e);
+                }
             }
         });
     });
@@ -212,8 +224,9 @@ function renderMarkers() {
         el.style.height = `${size}px`;
         el.style.borderRadius = '50%';
         el.style.backgroundColor = color;
+        el.style.opacity = MARKER_OPACITY;
         el.style.border = `2px solid ${strokeColor}`;
-        el.style.boxShadow = '0 3px 12px rgba(0,0,0,0.4)';
+        el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
         el.style.cursor = 'pointer';
         
         // Store original size for hover effect
@@ -293,9 +306,8 @@ function renderMarkers() {
 
 function calculateMarkerSize(totalTrails) {
     // Size markers based on resort size (total trails)
-    // Range: 10px (tiny resorts) to 50px (huge resorts like Vail)
-    const minSize = 12;
-    const maxSize = 50;
+    const minSize = MARKER_SIZE.min;
+    const maxSize = MARKER_SIZE.max;
     const minTrails = 7;  // Echo Mountain
     const maxTrails = 277; // Vail
     
