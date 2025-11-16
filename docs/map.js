@@ -37,51 +37,8 @@ function initMap() {
     // Add fullscreen control
     map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
     
-    // Enhance highway visibility on light basemap when map loads
-    map.on('load', () => {
-        // Make highways more visible with high-viz colors
-        // Try multiple possible layer names (varies by Mapbox style)
-        const possibleLayers = [
-            'road-motorway-trunk',
-            'road-motorway',
-            'road-primary',
-            'road-simple',
-            'road-street',
-            'road',
-            'highway-motorway-trunk',
-            'highway-motorway'
-        ];
-        
-        // Log available layers for debugging
-        const style = map.getStyle();
-        console.log('Available road layers:', 
-            style.layers.filter(l => l.id.includes('road') || l.id.includes('highway'))
-                       .map(l => l.id));
-        
-        // Apply high-viz styling to any road layers we find
-        possibleLayers.forEach(layerId => {
-            if (map.getLayer(layerId)) {
-                console.log(`Styling layer: ${layerId}`);
-                
-                try {
-                    // Set bright colors for highways
-                    map.setPaintProperty(layerId, 'line-color', '#FF6B35');
-                    
-                    // Make them thicker
-                    map.setPaintProperty(layerId, 'line-width', [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        5, 2.5,
-                        8, 4,
-                        12, 6
-                    ]);
-                } catch (e) {
-                    console.log(`Could not style ${layerId}:`, e);
-                }
-            }
-        });
-    });
+    // Keep highways in their natural colors from the light-v11 style
+    // No custom styling needed - the default light-v11 roads look good!
 }
 
 function setupEventListeners() {
@@ -126,7 +83,9 @@ async function loadData() {
         // Update last update time
         if (resortData.length > 0) {
             const lastUpdate = resortData[0]['Last Updated'] || 'Unknown';
-            document.getElementById('lastUpdate').textContent = `Updated: ${lastUpdate}`;
+            // Format: "2025-11-16 11:46" → "Nov 16, 11:46am"
+            const formatted = formatTimestamp(lastUpdate);
+            document.getElementById('lastUpdate').textContent = `Updated ${formatted}`;
         }
         
         // Render markers
@@ -220,11 +179,14 @@ function renderMarkers() {
         // Create marker element with fixed positioning
         const el = document.createElement('div');
         el.className = 'custom-marker';
+        
+        // Convert hex color to rgba for opacity
+        const rgbaColor = hexToRgba(color, MARKER_OPACITY);
+        
         el.style.width = `${size}px`;
         el.style.height = `${size}px`;
         el.style.borderRadius = '50%';
-        el.style.backgroundColor = color;
-        el.style.opacity = MARKER_OPACITY;
+        el.style.backgroundColor = rgbaColor;  // Use rgba for opacity
         el.style.border = `2px solid ${strokeColor}`;
         el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
         el.style.cursor = 'pointer';
@@ -317,6 +279,31 @@ function calculateMarkerSize(totalTrails) {
     const size = minSize + (normalized * (maxSize - minSize));
     
     return Math.max(minSize, Math.min(maxSize, size));
+}
+
+function hexToRgba(hex, alpha) {
+    // Convert hex color to rgba with opacity
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function formatTimestamp(timestamp) {
+    // Format "2025-11-16 11:46" to "Nov 16, 11:46am"
+    try {
+        const date = new Date(timestamp);
+        const month = date.toLocaleDateString('en-US', { month: 'short' });
+        const day = date.getDate();
+        const hours = date.getHours();
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'pm' : 'am';
+        const displayHours = hours % 12 || 12;
+        
+        return `${month} ${day}, ${displayHours}:${minutes}${ampm}`;
+    } catch (e) {
+        return timestamp;
+    }
 }
 
 function getColorForPercentage(percent, status) {
