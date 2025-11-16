@@ -287,9 +287,12 @@ function renderMarkers() {
             }
         });
         
+        // Also include Denver metro (easternmost reference point)
+        bounds.extend([-104.9, 39.74]); // Denver coordinates
+        
         // Fit to the resort bounds with generous padding
         map.fitBounds(bounds, {
-            padding: {top: 80, bottom: 150, left: 30, right: 30},  // Extra bottom padding for horizontal legend
+            padding: {top: 60, bottom: 180, left: 20, right: 20},  // Extra bottom padding for horizontal legend
             duration: 1000
         });
     }

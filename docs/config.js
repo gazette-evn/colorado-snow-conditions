@@ -47,8 +47,8 @@ const STROKE_COLORS = {
 
 // Marker sizing (based on total trails)
 const MARKER_SIZE = {
-    min: 10,    // Smallest resorts (7 trails)
-    max: 40,    // Largest resorts (277 trails) - reduced for better visual balance
+    min: 8,     // Smallest resorts (7 trails)
+    max: 32,    // Largest resorts (277 trails) - smaller for cleaner look
 };
 
 // Marker opacity
