@@ -27,7 +27,8 @@ const MAP_CONFIG = {
     minZoom: 5,
     maxZoom: 12,
     // Custom style with perfect highway visibility and clean grey aesthetic
-    style: 'mapbox://styles/evnwlg/cmi25lrgp00nf01sug74vg0pt',
+    // Using full HTTPS URL to bypass protocol-based caching
+    style: 'https://api.mapbox.com/styles/v1/evnwlg/cmi25lrgp00nf01sug74vg0pt?fresh=20241116',
 };
 
 // Modern, sharp color scheme inspired by contemporary data viz

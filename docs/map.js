@@ -24,9 +24,14 @@ function initMap() {
     // Detect if mobile/narrow screen
     const isMobile = window.innerWidth < 768;
     
+    // Build style URL with access token (needed for HTTPS URLs)
+    const styleUrl = MAP_CONFIG.style.includes('http') 
+        ? MAP_CONFIG.style + '&access_token=' + MAPBOX_TOKEN
+        : MAP_CONFIG.style;
+    
     map = new mapboxgl.Map({
         container: 'map',
-        style: MAP_CONFIG.style,
+        style: styleUrl,
         minZoom: MAP_CONFIG.minZoom,
         maxZoom: MAP_CONFIG.maxZoom,
         pitch: 0
