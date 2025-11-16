@@ -24,8 +24,8 @@ function initMap() {
     map = new mapboxgl.Map({
         container: 'map',
         style: MAP_CONFIG.style,
-        center: MAP_CONFIG.center,
-        zoom: MAP_CONFIG.zoom,
+        center: [-106.0, 39.0],  // Shifted slightly east to better center Colorado
+        zoom: 7,  // Slightly closer to fit Colorado borders nicely
         minZoom: MAP_CONFIG.minZoom,
         maxZoom: MAP_CONFIG.maxZoom,
         pitch: 0
@@ -387,8 +387,8 @@ function createPopupHTML(resort) {
         </div>
         
         <div class="popup-footer">
-            ${updated ? `Updated: ${updated}<br>` : ''}
-            Source: ${source}
+            ${updated ? `${formatTimestamp(updated)}<br>` : ''}
+            ${source}
         </div>
     `;
 }
