@@ -17,8 +17,8 @@ const MAP_CONFIG = {
     zoom: 6.5,
     minZoom: 5,
     maxZoom: 12,
-    // Light grey basemap - already clean and minimal
-    style: 'mapbox://styles/mapbox/light-v11',
+    // Custom style with perfect highway visibility and clean grey aesthetic
+    style: 'mapbox://styles/evnwlg/cmi25lrgp00nf01sug74vg0pt',
 };
 
 // Modern, sharp color scheme inspired by contemporary data viz
