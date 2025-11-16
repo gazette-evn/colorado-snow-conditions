@@ -17,7 +17,7 @@ const MAP_CONFIG = {
     zoom: 6.5,
     minZoom: 5,
     maxZoom: 12,
-    style: 'mapbox://styles/mapbox/light-v11', // Light monochrome with highways
+    style: 'mapbox://styles/mapbox/streets-v12', // Streets with highways in high-viz colors
 };
 
 // Color scheme (trails open percentage)

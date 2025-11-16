@@ -167,6 +167,10 @@ function renderMarkers() {
         const trailsOpenPct = parseFloat(resort['Trails Open %']) || 0;
         const color = getColorForPercentage(trailsOpenPct, resort.Status);
         
+        // Calculate stroke color based on status
+        const isOpen = resort.Status === 'Open';
+        const strokeColor = isOpen ? '#2E7D32' : '#9E9E9E';  // Green for open, grey for closed
+        
         // Create marker element with fixed positioning
         const el = document.createElement('div');
         el.className = 'custom-marker';
@@ -174,7 +178,7 @@ function renderMarkers() {
         el.style.height = `${size}px`;
         el.style.borderRadius = '50%';
         el.style.backgroundColor = color;
-        el.style.border = '3px solid white';
+        el.style.border = `2px solid ${strokeColor}`;
         el.style.boxShadow = '0 3px 12px rgba(0,0,0,0.4)';
         el.style.cursor = 'pointer';
         
