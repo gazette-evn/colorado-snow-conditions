@@ -1,7 +1,7 @@
 // Configuration for Colorado Snow Conditions Map
 // Replace these values with your actual credentials
 
-const MAPBOX_TOKEN = 'YOUR_MAPBOX_PUBLIC_TOKEN_HERE';  // Get from https://account.mapbox.com/access-tokens/
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiZXZud2xnIiwiYSI6ImNtaTIzYTFnYzFneG8yaXB4NDg3M3RsaWwifQ.p3vhcRK8BQ22w5i9fdiM5w';  // Get from https://account.mapbox.com/access-tokens/
 
 // Your Google Sheet published as CSV
 // To get this URL:
@@ -9,7 +9,7 @@ const MAPBOX_TOKEN = 'YOUR_MAPBOX_PUBLIC_TOKEN_HERE';  // Get from https://accou
 // 2. File → Share → Publish to web
 // 3. Choose "Entire Document" and "Comma-separated values (.csv)"
 // 4. Click Publish and copy the URL
-const DATA_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-YOUR-SHEET-ID-HERE/pub?output=csv';
+const DATA_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRre-sQPQqn1VAhLoDgTOwOOTUdKnT688YjHZXQpxN0ArMwt4j9zPQYirvzQX1TxiSUJOXk8ma_AyYl/pub?output=csv';
 
 // Map configuration
 const MAP_CONFIG = {
