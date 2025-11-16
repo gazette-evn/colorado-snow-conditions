@@ -171,13 +171,14 @@ header h1 {
 }
 
 /* Marker Styling */
-.marker {
+.custom-marker {
     display: block;
-    transform-origin: center center;
+    position: absolute;
+    transition: width 0.2s ease, height 0.2s ease, box-shadow 0.2s ease;
 }
 
 .mapboxgl-marker {
-    will-change: transform;
+    /* Prevent any weird positioning issues */
 }
 
 /* Mapbox Popup Customization */

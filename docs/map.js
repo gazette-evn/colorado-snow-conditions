@@ -165,9 +165,9 @@ function renderMarkers() {
         const trailsOpenPct = parseFloat(resort['Trails Open %']) || 0;
         const color = getColorForPercentage(trailsOpenPct, resort.Status);
         
-        // Create marker element
+        // Create marker element with fixed positioning
         const el = document.createElement('div');
-        el.className = 'marker';
+        el.className = 'custom-marker';
         el.style.width = `${size}px`;
         el.style.height = `${size}px`;
         el.style.borderRadius = '50%';
@@ -175,30 +175,37 @@ function renderMarkers() {
         el.style.border = '3px solid white';
         el.style.boxShadow = '0 3px 12px rgba(0,0,0,0.4)';
         el.style.cursor = 'pointer';
-        el.style.transition = 'all 0.2s ease';
-        el.style.position = 'relative';
         
-        // Hover effect - fixed to prevent diagonal movement
+        // Store original size for hover effect
+        el.dataset.originalSize = size;
+        
+        // Hover effects
         el.addEventListener('mouseenter', () => {
-            el.style.transform = 'scale(1.2)';
-            el.style.zIndex = '1000';
+            const newSize = size * 1.2;
+            el.style.width = `${newSize}px`;
+            el.style.height = `${newSize}px`;
             el.style.boxShadow = '0 4px 16px rgba(0,0,0,0.5)';
         });
+        
         el.addEventListener('mouseleave', () => {
-            el.style.transform = 'scale(1)';
-            el.style.zIndex = '1';
+            el.style.width = `${size}px`;
+            el.style.height = `${size}px`;
             el.style.boxShadow = '0 3px 12px rgba(0,0,0,0.4)';
         });
         
         // Create popup
         const popup = new mapboxgl.Popup({
-            offset: size / 2 + 10,
+            offset: 25,
             closeButton: true,
-            closeOnClick: false
+            closeOnClick: false,
+            maxWidth: '320px'
         }).setHTML(createPopupHTML(resort));
         
-        // Create and add marker
-        const marker = new mapboxgl.Marker(el)
+        // Create and add marker with anchor set to center
+        const marker = new mapboxgl.Marker({
+            element: el,
+            anchor: 'center'  // This prevents the diagonal movement!
+        })
             .setLngLat([lng, lat])
             .setPopup(popup)
             .addTo(map);
