@@ -337,23 +337,50 @@ header h1 {
         font-size: 0.75rem;
     }
     
+    /* Horizontal legend at bottom on mobile */
     .legend {
-        bottom: 10px;
-        right: 10px;
-        padding: 0.75rem;
-        max-width: 160px;
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        max-width: none;
+        padding: 0.75rem 1rem;
     }
     
     .legend h3 {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .legend h4 {
         font-size: 0.75rem;
+        margin: 0.5rem 0 0.25rem 0;
+    }
+    
+    .legend-scale {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: space-between;
     }
     
     .legend-item {
         font-size: 0.7rem;
+        flex: 0 0 auto;
+    }
+    
+    .legend-color {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .size-examples {
+        justify-content: flex-start;
+        gap: 1rem;
     }
     
     .mapboxgl-popup-content {
-        min-width: 200px;
+        min-width: 220px;
+        padding: 0.75rem;
     }
 }
 

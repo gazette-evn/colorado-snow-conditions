@@ -13,8 +13,17 @@ const DATA_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRre-sQPQqn1VA
 
 // Map configuration
 const MAP_CONFIG = {
-    center: [-106.5, 39.0],  // Center of Colorado
-    zoom: 6.5,
+    // Colorado bounds (southwest and northeast corners)
+    bounds: [
+        [-109.06, 36.99],  // Southwest corner of Colorado
+        [-102.04, 41.00]   // Northeast corner of Colorado
+    ],
+    padding: {
+        top: 50,
+        bottom: 50,
+        left: 50,
+        right: 50
+    },
     minZoom: 5,
     maxZoom: 12,
     // Custom style with perfect highway visibility and clean grey aesthetic

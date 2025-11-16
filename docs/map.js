@@ -21,15 +21,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initMap() {
+    // Detect if mobile/narrow screen
+    const isMobile = window.innerWidth < 768;
+    
     map = new mapboxgl.Map({
         container: 'map',
         style: MAP_CONFIG.style,
-        center: [-106.0, 39.0],  // Shifted slightly east to better center Colorado
-        zoom: 7,  // Slightly closer to fit Colorado borders nicely
         minZoom: MAP_CONFIG.minZoom,
         maxZoom: MAP_CONFIG.maxZoom,
         pitch: 0
     });
+    
+    // On desktop: fit to Colorado bounds
+    // On mobile: will fit to resort data after loading (see renderMarkers)
+    if (!isMobile) {
+        map.fitBounds(MAP_CONFIG.bounds, {
+            padding: MAP_CONFIG.padding
+        });
+    }
     
     // Add navigation controls
     map.addControl(new mapboxgl.NavigationControl(), 'top-left');
@@ -37,8 +46,8 @@ function initMap() {
     // Add fullscreen control
     map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
     
-    // Use light-v11 as-is - it's already clean and roads are visible enough
-    // Focus on making the resort markers stand out instead of fighting with the basemap
+    // Store mobile state for later use
+    map._isMobile = isMobile;
 }
 
 function setupEventListeners() {
@@ -264,6 +273,26 @@ function renderMarkers() {
     });
     
     console.log(`Rendered ${markers.length} markers`);
+    
+    // On mobile, fit map to show all resort markers with padding
+    if (map._isMobile && markers.length > 0) {
+        const bounds = new mapboxgl.LngLatBounds();
+        
+        // Extend bounds to include all markers
+        filteredResorts.forEach(resort => {
+            const lat = parseFloat(resort.Latitude);
+            const lng = parseFloat(resort.Longitude);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                bounds.extend([lng, lat]);
+            }
+        });
+        
+        // Fit to the resort bounds with generous padding
+        map.fitBounds(bounds, {
+            padding: {top: 80, bottom: 150, left: 30, right: 30},  // Extra bottom padding for horizontal legend
+            duration: 1000
+        });
+    }
 }
 
 function calculateMarkerSize(totalTrails) {
