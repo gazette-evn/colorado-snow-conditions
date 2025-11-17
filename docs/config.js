@@ -30,13 +30,13 @@ const MAP_CONFIG = {
     style: 'mapbox://styles/evnwlg/cmi2cejel00ni01suefqyfex3',
 };
 
-// Modern, sharp color scheme inspired by contemporary data viz
+// Cool-toned color scheme: pale blue → bold pink-purple
 const COLOR_SCALE = {
-    closed: '#E8EAED',      // Very light grey (almost white) - minimal visual weight
-    veryLow: '#4285F4',     // Google blue - vibrant but professional (1-5%)
-    low: '#34A853',         // Google green - fresh and modern (6-25%)
-    medium: '#FBBC04',      // Google yellow - energetic (26-50%)
-    high: '#EA4335',        // Google red/orange - high energy (51-100%)
+    closed: '#E8EAED',      // Very light grey - minimal visual weight
+    veryLow: '#B4E7FF',     // Pale blue - early season (1-5%)
+    low: '#7BB5F5',         // Medium blue - building (6-25%)
+    medium: '#C77DFF',      // Bright purple - moderate (26-50%)
+    high: '#B9257A',        // Bold pink-purple - peak season (51-100%)
 };
 
 // Stroke colors - contemporary and crisp
