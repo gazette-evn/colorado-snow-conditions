@@ -300,8 +300,10 @@ function renderMarkers() {
 
 function calculateMarkerSize(totalTrails) {
     // Size markers based on resort size (total trails)
-    const minSize = MARKER_SIZE.min;
-    const maxSize = MARKER_SIZE.max;
+    // Use smaller sizes on mobile
+    const isMobile = window.innerWidth < 768;
+    const minSize = isMobile ? MARKER_SIZE.min * 0.75 : MARKER_SIZE.min;
+    const maxSize = isMobile ? MARKER_SIZE.max * 0.75 : MARKER_SIZE.max;
     const minTrails = 7;  // Echo Mountain
     const maxTrails = 277; // Vail
     

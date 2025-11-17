@@ -80,7 +80,7 @@ header h1 {
     position: absolute;
     bottom: 30px;
     right: 30px;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(8px);
     padding: 1.25rem;
     border-radius: 12px;
@@ -123,15 +123,15 @@ header h1 {
     flex-shrink: 0;
 }
 
-/* Closed gets dark border like on map */
+/* Desktop: Closed gets dark border like on map */
 .legend-item:first-child .legend-color {
-    background: #E8EAED;
-    border: 2px solid #424242;
+    background: #E8EAED !important;
+    border: 2px solid #424242 !important;
 }
 
-/* Open resorts get white border like on map */
+/* Desktop: Open resorts get white border like on map */
 .legend-item:not(:first-child) .legend-color {
-    border: 2px solid #F5F5F5;
+    border: 2px solid #F5F5F5 !important;
 }
 
 .legend-note {
@@ -346,44 +346,43 @@ header h1 {
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start;
         gap: 0.5rem;
+        flex-wrap: wrap;
     }
     
     .filter-btn {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.75rem;
+        padding: 0.35rem 0.7rem;
+        font-size: 0.7rem;
+        flex: 0 0 auto;
     }
     
     .last-update {
         width: auto;
-        margin-left: 0.5rem;
+        margin-left: auto;
         margin-top: 0;
         font-size: 0.65rem;
         white-space: nowrap;
         flex: 0 0 auto;
     }
     
-    /* Horizontal legend bar across bottom on mobile */
+    /* Stacked legend at bottom on mobile */
     .legend {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         max-width: none;
-        padding: 0.5rem 0.625rem;
-        background: rgba(255, 255, 255, 0.96);
+        padding: 0.5rem 0.75rem;
+        background: rgba(255, 255, 255, 0.94);
         backdrop-filter: blur(10px);
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 0.75rem;
-        justify-content: space-between;
+        flex-direction: column;
+        gap: 0.5rem;
         border-radius: 0;
         box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
         border: none;
         border-top: 1px solid rgba(0,0,0,0.08);
-        overflow-x: auto;
     }
     
     .legend h3 {
@@ -394,59 +393,70 @@ header h1 {
         display: none;
     }
     
-    /* Horizontal color scale - all in one row */
+    /* Color scale - horizontal row on top */
     .legend-scale {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
         gap: 0.5rem;
         align-items: center;
-        flex: 1;
+        justify-content: space-around;
+        overflow-x: auto;
     }
     
     .legend-item {
         font-size: 0.55rem;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
         gap: 0.2rem;
         flex: 0 0 auto;
+        text-align: center;
+    }
+    
+    .legend-item span {
         white-space: nowrap;
+        max-width: 50px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .legend-color {
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
         flex-shrink: 0;
     }
     
-    /* Size examples - horizontal in same row */
+    /* Size examples - horizontal row below with divider */
     .legend-size {
-        border-top: none;
-        border-left: 1px solid rgba(0,0,0,0.12);
-        padding-left: 0.625rem;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        border-left: none;
+        padding-top: 0.5rem;
+        padding-left: 0;
         display: flex;
         flex-direction: row;
         align-items: center;
-        gap: 0.375rem;
-        flex: 0 0 auto;
+        justify-content: space-around;
+        gap: 0.75rem;
     }
     
     .size-examples {
         display: flex;
         flex-direction: row;
-        gap: 0.375rem;
+        gap: 0.75rem;
         align-items: center;
+        justify-content: space-around;
+        flex: 1;
     }
     
     .size-example {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.15rem;
+        gap: 0.2rem;
     }
     
     .size-example span {
-        font-size: 0.5rem;
+        font-size: 0.55rem;
         line-height: 1;
     }
     
