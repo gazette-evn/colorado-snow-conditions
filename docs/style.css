@@ -80,7 +80,7 @@ header h1 {
     position: absolute;
     bottom: 30px;
     right: 30px;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(245, 245, 245, 0.85) !important;
     backdrop-filter: none !important;
     padding: 1.25rem;
     border-radius: 12px;
@@ -94,8 +94,8 @@ header h1 {
     font-size: 0.95rem;
     font-weight: 700;
     margin-bottom: 0.75rem;
-    color: #1565C0;
-    border-bottom: 2px solid #E3F2FD;
+    color: #5F6368;
+    border-bottom: 2px solid #9AA0A6;
     padding-bottom: 0.5rem;
 }
 
@@ -383,7 +383,7 @@ header h1 {
         right: 0;
         max-width: none;
         padding: 0.4rem 0.6rem 0.6rem 0.6rem;
-        background: rgba(255, 255, 255, 0.94) !important;
+        background: rgba(245, 245, 245, 0.94) !important;
         backdrop-filter: none !important;
         display: flex;
         flex-direction: column;
@@ -399,6 +399,9 @@ header h1 {
         font-size: 0.65rem;
         margin-bottom: 0.3rem;
         font-weight: 700;
+        color: #5F6368;
+        border-bottom: 1px solid #9AA0A6;
+        padding-bottom: 0.25rem;
     }
     
     .legend h4 {
@@ -406,6 +409,7 @@ header h1 {
         font-size: 0.6rem;
         margin-bottom: 0.25rem;
         font-weight: 600;
+        color: #5F6368;
     }
     
     /* Color scale - horizontal row on top */
@@ -489,42 +493,49 @@ header h1 {
     
     /* Compact mobile popups */
     .mapboxgl-popup-content {
-        min-width: 200px;
-        padding: 0.5rem;
-        font-size: 0.85rem;
+        min-width: 190px;
+        padding: 0.4rem;
+        font-size: 0.8rem;
     }
     
     .popup-header {
-        font-size: 0.95rem;
-        margin-bottom: 0.4rem;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+        line-height: 1.2;
     }
     
     .popup-status {
-        padding: 0.2rem 0.6rem;
-        font-size: 0.65rem;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.6rem;
+        margin-bottom: 0.35rem;
+    }
+    
+    .popup-section {
         margin-bottom: 0.4rem;
     }
     
-    .popup-grid {
-        gap: 0.4rem;
+    .popup-label {
+        font-size: 0.6rem;
+        margin-bottom: 0.25rem;
     }
     
-    .popup-item {
+    .popup-data {
+        margin-bottom: 0.2rem;
+    }
+    
+    .popup-data-label {
+        font-size: 0.65rem;
+    }
+    
+    .popup-data-value {
         font-size: 0.7rem;
     }
     
-    .popup-label {
-        font-size: 0.65rem;
-    }
-    
-    .popup-value {
-        font-size: 0.75rem;
-    }
-    
     .popup-footer {
-        margin-top: 0.4rem;
-        padding-top: 0.4rem;
-        font-size: 0.65rem;
+        margin-top: 0.35rem;
+        padding-top: 0.35rem;
+        font-size: 0.6rem;
+        line-height: 1.3;
     }
 }
 
