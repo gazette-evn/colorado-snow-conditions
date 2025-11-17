@@ -379,17 +379,17 @@ function formatTimestamp(timestamp) {
 }
 
 function getColorForPercentage(percent, status) {
-    // Modern color scale - uses Google Material colors for sharp, contemporary look
+    // Cool-toned color scale: blue → pink-purple gradient
     if (status === 'Closed' || percent === 0) {
         return COLOR_SCALE.closed;  // Very light grey
-    } else if (percent < 5) {
-        return COLOR_SCALE.veryLow;  // Blue (early season)
-    } else if (percent < 25) {
-        return COLOR_SCALE.low;  // Green (building)
-    } else if (percent < 50) {
-        return COLOR_SCALE.medium;  // Yellow (moderate)
+    } else if (percent < 10) {
+        return COLOR_SCALE.veryLow;  // Medium blue (1-10%)
+    } else if (percent < 35) {
+        return COLOR_SCALE.low;  // Lighter blue (10-35%)
+    } else if (percent < 75) {
+        return COLOR_SCALE.medium;  // Purple (35-75%)
     } else {
-        return COLOR_SCALE.high;  // Red/orange (peak)
+        return COLOR_SCALE.high;  // Pink-purple (75%+)
     }
 }
 

@@ -30,13 +30,13 @@ const MAP_CONFIG = {
     style: 'mapbox://styles/evnwlg/cmi2cejel00ni01suefqyfex3',
 };
 
-// Cool-toned color scheme: pale blue → bold pink-purple
+// Cool-toned color scheme: blue → pink-purple gradient
 const COLOR_SCALE = {
     closed: '#E8EAED',      // Very light grey - minimal visual weight
-    veryLow: '#B4E7FF',     // Pale blue - early season (1-5%)
-    low: '#7BB5F5',         // Medium blue - building (6-25%)
-    medium: '#C77DFF',      // Bright purple - moderate (26-50%)
-    high: '#B9257A',        // Bold pink-purple - peak season (51-100%)
+    veryLow: '#5BA4E8',     // Medium blue - early season (1-10%)
+    low: '#7BB5F5',         // Lighter blue - building (10-35%)
+    medium: '#C77DFF',      // Bright purple - moderate (35-75%)
+    high: '#B9257A',        // Bold pink-purple - peak season (75%+)
 };
 
 // Stroke colors - contemporary and crisp
