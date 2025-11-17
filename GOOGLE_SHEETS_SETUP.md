@@ -67,15 +67,18 @@ The JSON file looks like:
 
 ### For Local Testing:
 
-Edit your `.env` file:
+Edit your `.env` file (values shown here are **examples only** — use your own IDs and JSON, never commit real secrets):
 
 ```bash
 # Google Sheets Configuration
-GOOGLE_SHEETS_SPREADSHEET_ID=your_sheet_id_here
-GOOGLE_CREDENTIALS='paste_entire_json_here'
+GOOGLE_SHEETS_SPREADSHEET_ID=YOUR_SHEET_ID_HERE
+
+# Paste the full JSON from your service account key file as a single line.
+# Tip: keep this ONLY in your local .env and in GitHub Secrets, never in committed files.
+GOOGLE_CREDENTIALS='PASTE_YOUR_SERVICE_ACCOUNT_JSON_HERE'
 ```
 
-**Note:** The credentials should be the ENTIRE JSON content in single quotes.
+**Note:** `GOOGLE_CREDENTIALS` should contain the entire JSON from your service account key file, but it must live only in `.env` / GitHub Secrets — **never** in tracked source files.
 
 ### For GitHub Actions:
 
