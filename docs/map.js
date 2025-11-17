@@ -48,6 +48,11 @@ function initMap() {
     
     // Store mobile state for later use
     map._isMobile = isMobile;
+    
+    // Scale markers based on zoom level
+    map.on('zoom', () => {
+        updateMarkerSizes();
+    });
 }
 
 function setupEventListeners() {
@@ -173,9 +178,10 @@ function renderMarkers() {
             return;
         }
         
-        // Calculate marker size based on total trails
+        // Calculate marker size based on total trails and zoom level
         const totalTrails = parseFloat(resort['Total Trails']) || 0;
-        const size = calculateMarkerSize(totalTrails);
+        const zoom = map.getZoom();
+        const size = calculateMarkerSize(totalTrails, zoom);
         
         // Calculate marker color based on trails open percentage
         const trailsOpenPct = parseFloat(resort['Trails Open %']) || 0;
@@ -298,14 +304,21 @@ function renderMarkers() {
     }
 }
 
-function calculateMarkerSize(totalTrails) {
+function calculateMarkerSize(totalTrails, zoom = null) {
     // Size markers based on resort size (total trails)
     // Use smaller sizes on mobile
     const isMobile = window.innerWidth < 768;
-    const minSize = isMobile ? MARKER_SIZE.min * 0.75 : MARKER_SIZE.min;
-    const maxSize = isMobile ? MARKER_SIZE.max * 0.75 : MARKER_SIZE.max;
+    let minSize = isMobile ? MARKER_SIZE.min * 0.75 : MARKER_SIZE.min;
+    let maxSize = isMobile ? MARKER_SIZE.max * 0.75 : MARKER_SIZE.max;
     const minTrails = 7;  // Echo Mountain
     const maxTrails = 277; // Vail
+    
+    // Scale markers up when zoomed in
+    if (zoom !== null) {
+        const zoomScale = Math.max(1, Math.min(2, (zoom - 6) / 3)); // Scale 1x at zoom 6, 2x at zoom 9+
+        minSize *= zoomScale;
+        maxSize *= zoomScale;
+    }
     
     if (totalTrails <= 0) return minSize;
     
@@ -313,6 +326,29 @@ function calculateMarkerSize(totalTrails) {
     const size = minSize + (normalized * (maxSize - minSize));
     
     return Math.max(minSize, Math.min(maxSize, size));
+}
+
+function updateMarkerSizes() {
+    // Update all marker sizes based on current zoom level
+    const zoom = map.getZoom();
+    
+    markers.forEach((marker, index) => {
+        const resort = resortData.filter(r => {
+            if (currentFilter === 'open') {
+                return r.Status && r.Status.toLowerCase() === 'open';
+            }
+            return true;
+        })[index];
+        
+        if (!resort) return;
+        
+        const totalTrails = parseFloat(resort['Total Trails']) || 0;
+        const newSize = calculateMarkerSize(totalTrails, zoom);
+        
+        const el = marker.getElement();
+        el.style.width = `${newSize}px`;
+        el.style.height = `${newSize}px`;
+    });
 }
 
 function hexToRgba(hex, alpha) {
@@ -369,10 +405,10 @@ function createPopupHTML(resort) {
     // Terrain data
     const openTrails = resort['Open Trails'] || '0';
     const totalTrails = resort['Total Trails'] || '0';
-    const trailsPct = resort['Trails Open %'] || '0';
+    const trailsPct = Math.round(parseFloat(resort['Trails Open %']) || 0);
     const openLifts = resort['Open Lifts'] || '0';
     const totalLifts = resort['Total Lifts'] || '0';
-    const liftsPct = resort['Lifts Open %'] || '0';
+    const liftsPct = Math.round(parseFloat(resort['Lifts Open %']) || 0);
     
     // Metadata
     const source = resort['Data Source'] || '';
