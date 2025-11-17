@@ -292,7 +292,7 @@ function renderMarkers() {
         
         // Fit to the resort bounds with generous padding
         map.fitBounds(bounds, {
-            padding: {top: 60, bottom: 120, left: 20, right: 20},  // Extra bottom padding for fixed horizontal legend bar
+            padding: {top: 50, bottom: 100, left: 20, right: 20},  // Extra bottom padding for compact legend
             duration: 1000
         });
     }
