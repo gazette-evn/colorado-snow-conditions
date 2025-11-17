@@ -80,7 +80,7 @@ header h1 {
     position: absolute;
     bottom: 30px;
     right: 30px;
-    background: rgba(245, 245, 245, 0.85) !important;
+    background: rgba(235, 235, 235, 0.85) !important;
     backdrop-filter: none !important;
     padding: 1.25rem;
     border-radius: 12px;
@@ -383,7 +383,7 @@ header h1 {
         right: 0;
         max-width: none;
         padding: 0.4rem 0.6rem 0.6rem 0.6rem;
-        background: rgba(245, 245, 245, 0.94) !important;
+        background: rgba(235, 235, 235, 0.94) !important;
         backdrop-filter: none !important;
         display: flex;
         flex-direction: column;
@@ -494,48 +494,48 @@ header h1 {
     /* Compact mobile popups */
     .mapboxgl-popup-content {
         min-width: 190px;
-        padding: 0.4rem;
+        padding: 0.35rem;
         font-size: 0.8rem;
     }
     
     .popup-header {
-        font-size: 0.9rem;
-        margin-bottom: 0.3rem;
-        line-height: 1.2;
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+        line-height: 1.1;
     }
     
     .popup-status {
-        padding: 0.2rem 0.5rem;
-        font-size: 0.6rem;
-        margin-bottom: 0.35rem;
+        padding: 0.15rem 0.45rem;
+        font-size: 0.58rem;
+        margin-bottom: 0.3rem;
     }
     
     .popup-section {
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.3rem;
     }
     
     .popup-label {
-        font-size: 0.6rem;
-        margin-bottom: 0.25rem;
-    }
-    
-    .popup-data {
+        font-size: 0.58rem;
         margin-bottom: 0.2rem;
     }
     
+    .popup-data {
+        margin-bottom: 0.15rem;
+    }
+    
     .popup-data-label {
-        font-size: 0.65rem;
+        font-size: 0.62rem;
     }
     
     .popup-data-value {
-        font-size: 0.7rem;
+        font-size: 0.68rem;
     }
     
     .popup-footer {
-        margin-top: 0.35rem;
-        padding-top: 0.35rem;
-        font-size: 0.6rem;
-        line-height: 1.3;
+        margin-top: 0.3rem;
+        padding-top: 0.3rem;
+        font-size: 0.58rem;
+        line-height: 1.25;
     }
 }
 

@@ -414,8 +414,11 @@ function createPopupHTML(resort) {
     const source = resort['Data Source'] || '';
     const updated = resort['Last Updated'] || '';
     
+    // Clean resort name - remove "Ski Area" suffix
+    const resortName = (resort['Resort Name'] || '').replace(/\s+Ski Area$/i, '');
+    
     return `
-        <div class="popup-header">${resort['Resort Name']}</div>
+        <div class="popup-header">${resortName}</div>
         <div class="popup-status ${statusClass}">${status}</div>
         
         <div class="popup-section">
