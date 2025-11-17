@@ -80,8 +80,8 @@ header h1 {
     position: absolute;
     bottom: 30px;
     right: 30px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: none !important;
     padding: 1.25rem;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
@@ -113,6 +113,15 @@ header h1 {
     margin: 0.4rem 0;
     font-size: 0.8rem;
     color: #424242;
+}
+
+/* Desktop: show full labels, hide short */
+.legend-label-full {
+    display: inline;
+}
+
+.legend-label-short {
+    display: none;
 }
 
 .legend-color {
@@ -374,8 +383,8 @@ header h1 {
         right: 0;
         max-width: none;
         padding: 0.5rem 0.75rem;
-        background: rgba(255, 255, 255, 0.94);
-        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.94) !important;
+        backdrop-filter: none !important;
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
@@ -413,11 +422,13 @@ header h1 {
         text-align: center;
     }
     
-    .legend-item span {
-        white-space: nowrap;
-        max-width: 50px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    /* Mobile: hide full labels, show short abbreviated labels */
+    .legend-label-full {
+        display: none !important;
+    }
+    
+    .legend-label-short {
+        display: inline !important;
     }
     
     .legend-color {
@@ -464,9 +475,44 @@ header h1 {
         flex-shrink: 0;
     }
     
+    /* Compact mobile popups */
     .mapboxgl-popup-content {
-        min-width: 220px;
-        padding: 0.75rem;
+        min-width: 200px;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .popup-header {
+        font-size: 0.95rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    .popup-status {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.65rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    .popup-grid {
+        gap: 0.4rem;
+    }
+    
+    .popup-item {
+        font-size: 0.7rem;
+    }
+    
+    .popup-label {
+        font-size: 0.65rem;
+    }
+    
+    .popup-value {
+        font-size: 0.75rem;
+    }
+    
+    .popup-footer {
+        margin-top: 0.4rem;
+        padding-top: 0.4rem;
+        font-size: 0.65rem;
     }
 }
 
