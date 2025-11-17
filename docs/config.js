@@ -32,7 +32,7 @@ const MAP_CONFIG = {
 
 // Professional cool-to-warm gradient: blue → purple → magenta
 const COLOR_SCALE = {
-    closed: '#E8EAED',      // Light grey - minimal visual weight
+    closed: '#D5D8DC',      // Medium-light grey - subtle but visible
     veryLow: '#5398DC',     // Saturated blue - cool, early season (1-10%)
     low: '#8E7FDB',         // Blue-purple - transitioning (10-35%)
     medium: '#C67BC4',      // Purple-magenta - warming up (35-75%)
