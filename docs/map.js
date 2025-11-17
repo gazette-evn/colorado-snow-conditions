@@ -297,10 +297,10 @@ function renderMarkers() {
         bounds.extend([-104.9, 39.74]); // Denver coordinates
         
         // Fit to the resort bounds with generous padding
-        // MOBILE: Small top (header only), BIG bottom (legend), tight sides
+        // MOBILE: Minimal top (header only), HUGE bottom (legend), tight sides
         // DESKTOP: Uses MAP_CONFIG.padding (50px all sides) - see line 38-40
         map.fitBounds(bounds, {
-            padding: {top: 80, bottom: 240, left: 15, right: 15},
+            padding: {top: 60, bottom: 260, left: 10, right: 10},
             duration: 1000
         });
     }
