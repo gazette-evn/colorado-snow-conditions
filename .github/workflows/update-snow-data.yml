@@ -1,9 +1,10 @@
 name: Update Colorado Snow Conditions
 
 on:
-  # Run every 2 hours during ski season (November - April)
+  # Run every 2 hours at Mountain Time-friendly hours (8am, 10am, 12pm, 2pm, 4pm, 6pm MT)
+  # Times are in UTC (Mountain Time is UTC-7, so add 7 hours)
   schedule:
-    - cron: '0 */2 * * *'  # Every 2 hours
+    - cron: '0 15,17,19,21,23,1 * * *'  # 8am, 10am, 12pm, 2pm, 4pm, 6pm MT (Nov-Mar)
   
   # Allow manual trigger for testing
   workflow_dispatch:
