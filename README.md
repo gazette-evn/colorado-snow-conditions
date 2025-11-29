@@ -98,10 +98,3 @@ open docs/index.html             # View map locally
 
 ---
 
-## License
-
-Open source - feel free to fork and adapt for other regions!
-
----
-
-**Built with ⛷️ by Evan Wyloge**
