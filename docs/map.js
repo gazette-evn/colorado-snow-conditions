@@ -398,16 +398,7 @@ function createPopupHTML(resort) {
     const statusClass = status.toLowerCase();
     
     // Snow data
-    const snow24hRaw = resort['24h Snowfall (in)'] || '';
-    const snow48hRaw = resort['48h Snowfall (in)'] || '';
-    
-    const snow24h = snow24hRaw === '' ? '0' : snow24hRaw;
-    
-    // If the source only reports a 24h value and leaves 48h blank/zero,
-    // hide the 48h row instead of showing "0\"" which feels misleading.
-    const has24hSnow = snow24h !== '0';
-    const show48hSnow = snow48hRaw !== '' && !(has24hSnow && snow48hRaw === '0');
-    const snow48h = show48hSnow ? snow48hRaw : null;
+    const snow24h = resort['24h Snowfall (in)'] || '0';
     const baseDepth = resort['Base Depth (in)'] || '0';
     const midDepth = resort['Mid-Mtn Depth (in)'] || '0';
     const surface = resort['Surface Conditions'] || 'N/A';
@@ -437,11 +428,6 @@ function createPopupHTML(resort) {
                 <span class="popup-data-label">24h Snowfall:</span>
                 <span class="popup-data-value">${snow24h}"</span>
             </div>
-            ${snow48h !== null ? `
-            <div class="popup-data">
-                <span class="popup-data-label">48h Snowfall:</span>
-                <span class="popup-data-value">${snow48h}"</span>
-            </div>` : ''}
             <div class="popup-data">
                 <span class="popup-data-label">Base Depth:</span>
                 <span class="popup-data-value">${baseDepth}"</span>
