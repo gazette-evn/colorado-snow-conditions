@@ -91,14 +91,18 @@ def _write_csv(df, output_path):
 
 
 def main():
-    ca_resorts = _load_resorts(CALIFORNIA_CSV, "CA")
-    co_resorts = _load_resorts(COLORADO_CSV, "CO")
+    run_ca = os.environ.get("RUN_CA", "").lower() in {"1", "true", "yes"}
+    run_co = os.environ.get("RUN_CO", "true").lower() in {"1", "true", "yes"}
 
-    ca_df = _build_rows(ca_resorts)
-    co_df = _build_rows(co_resorts)
+    if run_ca and os.path.exists(CALIFORNIA_CSV):
+        ca_resorts = _load_resorts(CALIFORNIA_CSV, "CA")
+        ca_df = _build_rows(ca_resorts)
+        _write_csv(ca_df, OUTPUT_CA)
 
-    _write_csv(ca_df, OUTPUT_CA)
-    _write_csv(co_df, OUTPUT_CO)
+    if run_co:
+        co_resorts = _load_resorts(COLORADO_CSV, "CO")
+        co_df = _build_rows(co_resorts)
+        _write_csv(co_df, OUTPUT_CO)
 
 
 if __name__ == "__main__":

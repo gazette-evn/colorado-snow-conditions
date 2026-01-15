@@ -47,6 +47,9 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: Generate forecast CSV
+      env:
+        RUN_CO: "true"
+        RUN_CA: "false"
       run: |
         python open_meteo_forecast_export.py
 
