@@ -1,0 +1,69 @@
+name: Update Colorado Snow Forecast
+
+on:
+  # Run daily at 5am Mountain Time (UTC-7 -> 12:00 UTC)
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-forecast-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Verify environment variables
+      run: |
+        echo "Checking environment setup..."
+        if [ -z "$GOOGLE_SHEETS_FORECAST_ID" ]; then
+          echo "❌ ERROR: GOOGLE_SHEETS_FORECAST_ID is not set!"
+          exit 1
+        else
+          echo "✅ GOOGLE_SHEETS_FORECAST_ID is set"
+        fi
+        
+        if [ -z "$GOOGLE_CREDENTIALS" ]; then
+          echo "❌ ERROR: GOOGLE_CREDENTIALS is not set!"
+          exit 1
+        else
+          echo "✅ GOOGLE_CREDENTIALS is set (${#GOOGLE_CREDENTIALS} characters)"
+        fi
+      env:
+        GOOGLE_SHEETS_FORECAST_ID: ${{ secrets.GOOGLE_SHEETS_FORECAST_ID }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    - name: Generate forecast CSV
+      run: |
+        python open_meteo_forecast_export.py
+
+    - name: Update Google Sheets (forecast)
+      env:
+        GOOGLE_SHEETS_FORECAST_ID: ${{ secrets.GOOGLE_SHEETS_FORECAST_ID }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+      run: |
+        python google_sheets_forecast_updater.py
+
+    - name: Upload logs and CSV as artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: forecast-update-logs-${{ github.run_number }}
+        path: |
+          *.log
+          colorado_snow_forecast.csv
+        retention-days: 30
+        if-no-files-found: warn
