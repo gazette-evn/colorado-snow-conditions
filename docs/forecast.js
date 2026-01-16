@@ -12,6 +12,13 @@ const formatDateLabel = (value) => {
   return `${weekday} ${month}/${day}`;
 };
 
+const scaledHeight = (value, maxValue) => {
+  const amount = roundToHalf(value);
+  if (amount <= 0) return 0;
+  const scaled = Math.log1p(amount) / Math.log1p(maxValue);
+  return Math.min(scaled, 1) * 100;
+};
+
 const snowClass = (value) => {
   const amount = roundToHalf(value);
   if (amount <= 0) return "snow-0";
@@ -42,7 +49,7 @@ const buildColumns = (dateColumns) => {
       formatter: (cell) => {
         const value = roundToHalf(cell.getValue());
         const klass = snowClass(value);
-        const height = Math.min(value / 10, 1) * 100;
+        const height = scaledHeight(value, 10);
         return `
           <div class="snow-cell">
             <div class="snow-value">${formatValue(value)}</div>
@@ -64,7 +71,7 @@ const buildColumns = (dateColumns) => {
     formatter: (cell) => {
       const value = roundToHalf(cell.getValue());
       const klass = snowClass(value);
-      const height = Math.min(value / 20, 1) * 100;
+      const height = scaledHeight(value, 20);
       return `
         <div class="snow-cell">
           <div class="snow-value">${formatValue(value)}</div>
