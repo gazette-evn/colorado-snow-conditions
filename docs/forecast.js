@@ -139,7 +139,7 @@ const renderTable = (rows) => {
     data: rows,
     layout: "fitColumns",
     height: "70vh",
-    rowHeight: 56,
+    rowHeight: 44,
     columns: buildColumns(dateColumns),
     initialSort: [{ column: "Five-day total", dir: "desc" }],
   });

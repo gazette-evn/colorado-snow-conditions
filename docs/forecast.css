@@ -6,10 +6,10 @@
   --bg: #ffffff;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   --snow-0: #f3f4f6;
-  --snow-1-2: #dbeafe;
-  --snow-3-6: #93c5fd;
-  --snow-7-10: #3b82f6;
-  --snow-10-plus: #1e3a8a;
+  --snow-1-2: #cfe3ff;
+  --snow-3-6: #7fb3ff;
+  --snow-7-10: #2f6fe0;
+  --snow-10-plus: #0f3d91;
 }
 
 * {
@@ -83,9 +83,9 @@ body {
 }
 
 .tabulator {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+  border: 1px solid #333333;
+  border-radius: 6px;
+  box-shadow: none;
   overflow: hidden;
 }
 
@@ -183,7 +183,7 @@ body {
   width: 18px;
   height: 26px;
   background: transparent;
-  border-radius: 6px;
+  border-radius: 0;
   display: flex;
   align-items: flex-end;
   overflow: hidden;
