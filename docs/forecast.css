@@ -137,6 +137,35 @@ body {
   padding-right: 14px;
 }
 
+.tabulator .tabulator-col .tabulator-col-sorter {
+  display: none;
+}
+
+.tabulator .tabulator-col[aria-sort="ascending"] .tabulator-col-title::after,
+.tabulator .tabulator-col[aria-sort="descending"] .tabulator-col-title::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+
+.tabulator .tabulator-col[aria-sort="ascending"] .tabulator-col-title::after {
+  border-bottom: 6px solid #333333;
+}
+
+.tabulator .tabulator-col[aria-sort="descending"] .tabulator-col-title::after {
+  border-top: 6px solid #333333;
+}
+
+.tabulator .tabulator-col-title {
+  position: relative;
+}
+
 .snow-cell {
   display: flex;
   flex-direction: column;
