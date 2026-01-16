@@ -9,6 +9,8 @@ from datetime import datetime
 
 import pandas as pd
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from combined_scraper import RESORT_DATA
 
 
@@ -43,6 +45,15 @@ def _load_resorts(csv_path, state_label):
 
 
 def _fetch_open_meteo_daily(lat, lon):
+    session = requests.Session()
+    retries = Retry(
+        total=3,
+        backoff_factor=1.5,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"],
+        raise_on_status=False,
+    )
+    session.mount("https://", HTTPAdapter(max_retries=retries))
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -50,7 +61,7 @@ def _fetch_open_meteo_daily(lat, lon):
         "forecast_days": 7,
         "timezone": "auto",
     }
-    resp = requests.get("https://api.open-meteo.com/v1/forecast", params=params, timeout=30)
+    resp = session.get("https://api.open-meteo.com/v1/forecast", params=params, timeout=60)
     resp.raise_for_status()
     return resp.json()
 
@@ -68,11 +79,14 @@ def _build_rows(resorts_df):
         lat = float(row["Latitude"])
         lon = float(row["Longitude"])
 
-        payload = _fetch_open_meteo_daily(lat, lon)
-        daily = payload.get("daily", {})
-        snowfall_cm = daily.get("snowfall_sum", []) or []
+        try:
+            payload = _fetch_open_meteo_daily(lat, lon)
+            daily = payload.get("daily", {})
+            snowfall_cm = daily.get("snowfall_sum", []) or []
+        except requests.RequestException:
+            snowfall_cm = []
 
-        snowfall_in = _cm_to_inches(snowfall_cm[:7])
+        snowfall_in = _cm_to_inches(snowfall_cm[:7]) if snowfall_cm else []
         while len(snowfall_in) < 7:
             snowfall_in.append(0.0)
 
