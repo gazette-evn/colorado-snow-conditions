@@ -42,12 +42,12 @@ const buildColumns = (dateColumns) => {
       formatter: (cell) => {
         const value = roundToHalf(cell.getValue());
         const klass = snowClass(value);
-        const width = Math.min(value / 10, 1) * 100;
+        const height = Math.min(value / 10, 1) * 100;
         return `
           <div class="snow-cell">
             <div class="snow-value">${formatValue(value)}</div>
-            <div class="snow-bar">
-              <div class="snow-bar-fill ${klass}" style="width:${width}%"></div>
+            <div class="snow-column">
+              <div class="snow-column-fill ${klass}" style="height:${height}%"></div>
             </div>
           </div>
         `;
@@ -64,12 +64,12 @@ const buildColumns = (dateColumns) => {
     formatter: (cell) => {
       const value = roundToHalf(cell.getValue());
       const klass = snowClass(value);
-      const width = Math.min(value / 20, 1) * 100;
+      const height = Math.min(value / 20, 1) * 100;
       return `
         <div class="snow-cell">
           <div class="snow-value">${formatValue(value)}</div>
-          <div class="snow-bar">
-            <div class="snow-bar-fill ${klass}" style="width:${width}%"></div>
+          <div class="snow-column">
+            <div class="snow-column-fill ${klass}" style="height:${height}%"></div>
           </div>
         </div>
       `;
@@ -132,7 +132,7 @@ const renderTable = (rows) => {
     data: rows,
     layout: "fitColumns",
     height: "70vh",
-    rowHeight: 48,
+    rowHeight: 56,
     columns: buildColumns(dateColumns),
     initialSort: [{ column: "Five-day total", dir: "desc" }],
   });
