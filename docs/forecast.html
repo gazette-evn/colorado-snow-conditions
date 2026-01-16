@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Colorado Snow Forecast Table</title>
+    <link rel="stylesheet" href="forecast.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator.min.css"
+    />
+  </head>
+  <body>
+    <header class="page-header">
+      <h1>Colorado Snow Forecast</h1>
+      <div class="meta">
+        <span id="last-updated">Last updated: —</span>
+        <span class="source">Source: Open-Meteo</span>
+      </div>
+    </header>
+
+    <section class="legend">
+      <div class="legend-item"><span class="swatch snow-0"></span>0"</div>
+      <div class="legend-item"><span class="swatch snow-1-2"></span>1–2"</div>
+      <div class="legend-item"><span class="swatch snow-3-6"></span>3–6"</div>
+      <div class="legend-item"><span class="swatch snow-7-10"></span>7–10"</div>
+      <div class="legend-item"><span class="swatch snow-10-plus"></span>10"+</div>
+    </section>
+
+    <main>
+      <div id="forecast-table"></div>
+    </main>
+
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
+    <script src="forecast.js"></script>
+  </body>
+</html>

@@ -1,0 +1,145 @@
+:root {
+  color-scheme: light;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #ffffff;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --snow-0: #f3f4f6;
+  --snow-1-2: #dbeafe;
+  --snow-3-6: #93c5fd;
+  --snow-7-10: #3b82f6;
+  --snow-10-plus: #1e3a8a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.meta {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 16px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+.snow-0 {
+  background: var(--snow-0);
+}
+.snow-1-2 {
+  background: var(--snow-1-2);
+}
+.snow-3-6 {
+  background: var(--snow-3-6);
+}
+.snow-7-10 {
+  background: var(--snow-7-10);
+}
+.snow-10-plus {
+  background: var(--snow-10-plus);
+}
+
+.tabulator {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.tabulator .tabulator-header {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+.snow-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.snow-value {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.snow-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.snow-bar-fill {
+  height: 100%;
+}
+
+.snow-bar-fill.snow-0 {
+  background: var(--snow-0);
+}
+.snow-bar-fill.snow-1-2 {
+  background: var(--snow-1-2);
+}
+.snow-bar-fill.snow-3-6 {
+  background: var(--snow-3-6);
+}
+.snow-bar-fill.snow-7-10 {
+  background: var(--snow-7-10);
+}
+.snow-bar-fill.snow-10-plus {
+  background: var(--snow-10-plus);
+}
+
+@media (max-width: 900px) {
+  body {
+    padding: 16px;
+  }
+
+  .page-header h1 {
+    font-size: 22px;
+  }
+}

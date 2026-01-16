@@ -25,6 +25,8 @@ DAILY_VARS = [
     "snowfall_sum",
 ]
 
+FORECAST_DAYS = 5
+
 
 def _load_resorts(csv_path, state_label):
     if os.path.exists(csv_path):
@@ -58,7 +60,7 @@ def _fetch_open_meteo_daily(lat, lon):
         "latitude": lat,
         "longitude": lon,
         "daily": ",".join(DAILY_VARS),
-        "forecast_days": 7,
+        "forecast_days": FORECAST_DAYS,
         "timezone": "auto",
     }
     resp = session.get("https://api.open-meteo.com/v1/forecast", params=params, timeout=60)
@@ -96,20 +98,20 @@ def _build_rows(resorts_df):
             daily = payload.get("daily", {})
             snowfall_cm = daily.get("snowfall_sum", []) or []
             if date_headers is None:
-                date_headers = _format_date_labels(daily.get("time", [])[:7])
+                date_headers = _format_date_labels(daily.get("time", [])[:FORECAST_DAYS])
         except requests.RequestException:
             snowfall_cm = []
 
-        snowfall_in = _cm_to_inches(snowfall_cm[:7]) if snowfall_cm else []
-        while len(snowfall_in) < 7:
+        snowfall_in = _cm_to_inches(snowfall_cm[:FORECAST_DAYS]) if snowfall_cm else []
+        while len(snowfall_in) < FORECAST_DAYS:
             snowfall_in.append(0.0)
 
-        total_7day = round(sum(snowfall_in), 2)
+        total_5day = round(sum(snowfall_in), 2)
         days_with_snow = sum(1 for val in snowfall_in if val > 0)
 
         row_data = {
             "Resort": name,
-            "Seven-day snowfall forecast": total_7day,
+            "Five-day total": total_5day,
             "Forecasted snowfall days": days_with_snow,
             "Last_Updated": timestamp,
         }
@@ -118,7 +120,7 @@ def _build_rows(resorts_df):
             for idx, label in enumerate(date_headers):
                 row_data[label] = snowfall_in[idx]
         else:
-            for idx in range(7):
+            for idx in range(FORECAST_DAYS):
                 row_data[f"Day{idx+1}"] = snowfall_in[idx]
 
         rows.append(row_data)
@@ -127,7 +129,7 @@ def _build_rows(resorts_df):
         ordered_columns = (
             ["Resort"]
             + date_headers
-            + ["Seven-day snowfall forecast", "Forecasted snowfall days", "Last_Updated"]
+            + ["Five-day total", "Forecasted snowfall days", "Last_Updated"]
         )
         return pd.DataFrame(rows)[ordered_columns]
 
