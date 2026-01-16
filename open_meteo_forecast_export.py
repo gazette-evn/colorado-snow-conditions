@@ -9,6 +9,7 @@ from datetime import datetime
 
 import pandas as pd
 import requests
+from combined_scraper import RESORT_DATA
 
 
 CALIFORNIA_CSV = "california_resorts_combined.csv"
@@ -24,11 +25,21 @@ DAILY_VARS = [
 
 
 def _load_resorts(csv_path, state_label):
-    df = pd.read_csv(csv_path)
-    df = df.rename(columns={"latitude": "Latitude", "longitude": "Longitude"})
-    df = df[df["Latitude"].notna() & df["Longitude"].notna()]
-    df["State"] = state_label
-    return df[["name", "Latitude", "Longitude", "State"]]
+    if os.path.exists(csv_path):
+        df = pd.read_csv(csv_path)
+        df = df.rename(columns={"latitude": "Latitude", "longitude": "Longitude"})
+        df = df[df["Latitude"].notna() & df["Longitude"].notna()]
+        df["State"] = state_label
+        return df[["name", "Latitude", "Longitude", "State"]]
+
+    if state_label == "CO":
+        fallback_rows = [
+            {"name": name, "Latitude": data["lat"], "Longitude": data["lng"], "State": "CO"}
+            for name, data in RESORT_DATA.items()
+        ]
+        return pd.DataFrame(fallback_rows)
+
+    raise FileNotFoundError(f"Missing resort CSV: {csv_path}")
 
 
 def _fetch_open_meteo_daily(lat, lon):
