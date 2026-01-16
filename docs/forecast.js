@@ -5,6 +5,13 @@ const DATE_REGEX = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
 
 const roundToHalf = (value) => Math.round((Number(value) || 0) * 2) / 2;
 
+const formatDateLabel = (value) => {
+  const [month, day, year] = value.split("/").map(Number);
+  const date = new Date(year, month - 1, day);
+  const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+  return `${weekday} ${month}/${day}`;
+};
+
 const snowClass = (value) => {
   const amount = roundToHalf(value);
   if (amount <= 0) return "snow-0";
@@ -26,9 +33,10 @@ const buildColumns = (dateColumns) => {
 
   dateColumns.forEach((date) => {
     columns.push({
-      title: date,
+      title: formatDateLabel(date),
       field: date,
       hozAlign: "center",
+      headerHozAlign: "center",
       headerSort: true,
       sorter: "number",
       formatter: (cell) => {
@@ -51,6 +59,7 @@ const buildColumns = (dateColumns) => {
     title: "Five-day forecast",
     field: "Five-day total",
     hozAlign: "center",
+    headerHozAlign: "center",
     sorter: "number",
     formatter: (cell) => {
       const value = roundToHalf(cell.getValue());
@@ -72,9 +81,14 @@ const buildColumns = (dateColumns) => {
       title: "Forecasted snowfall days",
       field: "Forecasted snowfall days",
       hozAlign: "center",
+      headerHozAlign: "center",
       sorter: "number",
     },
-    { title: "Last Updated", field: "Last_Updated", headerSort: false }
+    {
+      title: "Last updated",
+      field: "Last_Updated",
+      headerSort: false,
+    }
   );
 
   return columns;
@@ -85,12 +99,25 @@ const parseDate = (value) => {
   return new Date(year, month - 1, day);
 };
 
+const formatUpdated = (value) => {
+  if (!value) return "—";
+  const normalized = value.replace(" ", "T");
+  const parsed = new Date(normalized);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
 const updateLastUpdated = (rows) => {
   const lastUpdated = rows?.[0]?.["Last_Updated"];
   if (lastUpdated) {
     const el = document.getElementById("last-updated");
     if (el) {
-      el.textContent = `Last updated: ${lastUpdated}`;
+      el.textContent = `Last updated: ${formatUpdated(lastUpdated)}`;
     }
   }
 };
