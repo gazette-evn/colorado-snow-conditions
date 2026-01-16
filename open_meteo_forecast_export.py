@@ -11,11 +11,11 @@ import pandas as pd
 import requests
 
 
-CALIFORNIA_CSV = "/Users/evanwyloge/california-snow-conditions/california_resorts_combined.csv"
-COLORADO_CSV = "/Users/evanwyloge/snow-conditions-data/colorado_resorts_combined.csv"
+CALIFORNIA_CSV = "california_resorts_combined.csv"
+COLORADO_CSV = "colorado_resorts_combined.csv"
 
-OUTPUT_CA = "/Users/evanwyloge/california-snow-conditions/california_snow_forecast.csv"
-OUTPUT_CO = "/Users/evanwyloge/snow-conditions-data/colorado_snow_forecast.csv"
+OUTPUT_CA = "california_snow_forecast.csv"
+OUTPUT_CO = "colorado_snow_forecast.csv"
 
 
 DAILY_VARS = [
