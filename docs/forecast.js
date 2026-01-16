@@ -3,8 +3,10 @@ const CSV_URL =
 
 const DATE_REGEX = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
 
+const roundToHalf = (value) => Math.round((Number(value) || 0) * 2) / 2;
+
 const snowClass = (value) => {
-  const amount = Number(value) || 0;
+  const amount = roundToHalf(value);
   if (amount <= 0) return "snow-0";
   if (amount <= 2) return "snow-1-2";
   if (amount <= 6) return "snow-3-6";
@@ -13,8 +15,8 @@ const snowClass = (value) => {
 };
 
 const formatValue = (value) => {
-  const amount = Number(value) || 0;
-  return amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2);
+  const amount = roundToHalf(value);
+  return amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(1);
 };
 
 const buildColumns = (dateColumns) => {
@@ -30,7 +32,7 @@ const buildColumns = (dateColumns) => {
       headerSort: true,
       sorter: "number",
       formatter: (cell) => {
-        const value = Number(cell.getValue()) || 0;
+        const value = roundToHalf(cell.getValue());
         const klass = snowClass(value);
         const width = Math.min(value / 10, 1) * 100;
         return `
@@ -45,13 +47,27 @@ const buildColumns = (dateColumns) => {
     });
   });
 
-  columns.push(
-    {
-      title: "Five-day total",
-      field: "Five-day total",
-      hozAlign: "center",
-      sorter: "number",
+  columns.push({
+    title: "Five-day forecast",
+    field: "Five-day total",
+    hozAlign: "center",
+    sorter: "number",
+    formatter: (cell) => {
+      const value = roundToHalf(cell.getValue());
+      const klass = snowClass(value);
+      const width = Math.min(value / 20, 1) * 100;
+      return `
+        <div class="snow-cell">
+          <div class="snow-value">${formatValue(value)}</div>
+          <div class="snow-bar">
+            <div class="snow-bar-fill ${klass}" style="width:${width}%"></div>
+          </div>
+        </div>
+      `;
     },
+  });
+
+  columns.push(
     {
       title: "Forecasted snowfall days",
       field: "Forecasted snowfall days",
@@ -89,6 +105,7 @@ const renderTable = (rows) => {
     data: rows,
     layout: "fitColumns",
     height: "70vh",
+    rowHeight: 48,
     columns: buildColumns(dateColumns),
     initialSort: [{ column: "Five-day total", dir: "desc" }],
   });
