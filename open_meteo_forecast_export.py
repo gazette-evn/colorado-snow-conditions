@@ -70,9 +70,21 @@ def _cm_to_inches(values):
     return [round(float(value) / 2.54, 2) for value in values]
 
 
+def _format_date_labels(date_strings):
+    labels = []
+    for value in date_strings:
+        try:
+            dt = datetime.fromisoformat(value)
+            labels.append(f"{dt.month}/{dt.day}/{dt.year}")
+        except (TypeError, ValueError):
+            continue
+    return labels
+
+
 def _build_rows(resorts_df):
     rows = []
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    date_headers = None
 
     for _, row in resorts_df.iterrows():
         name = str(row["name"])
@@ -83,6 +95,8 @@ def _build_rows(resorts_df):
             payload = _fetch_open_meteo_daily(lat, lon)
             daily = payload.get("daily", {})
             snowfall_cm = daily.get("snowfall_sum", []) or []
+            if date_headers is None:
+                date_headers = _format_date_labels(daily.get("time", [])[:7])
         except requests.RequestException:
             snowfall_cm = []
 
@@ -93,19 +107,29 @@ def _build_rows(resorts_df):
         total_7day = round(sum(snowfall_in), 2)
         days_with_snow = sum(1 for val in snowfall_in if val > 0)
 
-        rows.append({
+        row_data = {
             "Resort": name,
-            "Day1": snowfall_in[0],
-            "Day2": snowfall_in[1],
-            "Day3": snowfall_in[2],
-            "Day4": snowfall_in[3],
-            "Day5": snowfall_in[4],
-            "Day6": snowfall_in[5],
-            "Day7": snowfall_in[6],
-            "Total_7day": total_7day,
-            "Days_With_Snow": days_with_snow,
+            "Seven-day snowfall forecast": total_7day,
+            "Forecasted snowfall days": days_with_snow,
             "Last_Updated": timestamp,
-        })
+        }
+
+        if date_headers:
+            for idx, label in enumerate(date_headers):
+                row_data[label] = snowfall_in[idx]
+        else:
+            for idx in range(7):
+                row_data[f"Day{idx+1}"] = snowfall_in[idx]
+
+        rows.append(row_data)
+
+    if date_headers:
+        ordered_columns = (
+            ["Resort"]
+            + date_headers
+            + ["Seven-day snowfall forecast", "Forecasted snowfall days", "Last_Updated"]
+        )
+        return pd.DataFrame(rows)[ordered_columns]
 
     return pd.DataFrame(rows)
 
