@@ -72,8 +72,6 @@ body {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 6px;
-  width: max-content;
-  max-width: 100%;
 }
 
 #forecast-table {
@@ -152,11 +150,11 @@ body {
 }
 
 .tabulator-row.tabulator-row-even {
-  background-color: #fcfcfc;
+  background-color: #fefefe;
 }
 
 .tabulator .tabulator-header .tabulator-col {
-  background: #ffffff;
+  background: transparent;
   color: var(--text);
   border-right: 1px solid var(--border);
 }
@@ -195,6 +193,8 @@ body {
 
 .tabulator .tabulator-col .tabulator-col-content {
   padding: 8px 16px;
+  text-align: center;
+  justify-content: center;
 }
 
 .tabulator .tabulator-col.resort-col .tabulator-col-content,

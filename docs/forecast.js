@@ -61,6 +61,7 @@ const buildColumns = (dateColumns, sizes) => {
       frozen: true,
       headerSort: true,
       headerSortStartingDir: "desc",
+      headerHozAlign: "center",
       cssClass: "resort-col",
       width: sizes.resortWidth,
       minWidth: sizes.resortMin,
@@ -89,7 +90,7 @@ const buildColumns = (dateColumns, sizes) => {
         const height = scaledHeight(value, 10);
         return `
           <div class="snow-cell">
-            <div class="snow-value">${formatValue(value)}</div>
+            <div class="snow-value">${formatValue(value)}"</div>
             <div class="snow-column">
               <div class="snow-column-fill ${klass}" style="height:${height}%"></div>
             </div>
@@ -118,7 +119,7 @@ const buildColumns = (dateColumns, sizes) => {
       const height = scaledHeight(value, 20);
       return `
         <div class="snow-cell">
-          <div class="snow-value">${formatValue(value)}</div>
+          <div class="snow-value">${formatValue(value)}"</div>
           <div class="snow-column">
             <div class="snow-column-fill ${klass}" style="height:${height}%"></div>
           </div>
