@@ -35,7 +35,14 @@ const formatValue = (value) => {
 
 const buildColumns = (dateColumns) => {
   const columns = [
-    { title: "Resort", field: "Resort", frozen: true, headerSort: true },
+    {
+      title: "Resort",
+      field: "Resort",
+      frozen: true,
+      headerSort: true,
+      width: 220,
+      minWidth: 180,
+    },
   ];
 
   dateColumns.forEach((date) => {
@@ -46,6 +53,9 @@ const buildColumns = (dateColumns) => {
       headerHozAlign: "center",
       headerSort: true,
       sorter: "number",
+      cssClass: "forecast-day",
+      width: 90,
+      minWidth: 80,
       formatter: (cell) => {
         const value = roundToHalf(cell.getValue());
         const klass = snowClass(value);
@@ -63,11 +73,14 @@ const buildColumns = (dateColumns) => {
   });
 
   columns.push({
-    title: "Five-day forecast",
+    title: "5-day total",
     field: "Five-day total",
     hozAlign: "center",
     headerHozAlign: "center",
     sorter: "number",
+    cssClass: "forecast-total",
+    width: 120,
+    minWidth: 110,
     formatter: (cell) => {
       const value = roundToHalf(cell.getValue());
       const klass = snowClass(value);
@@ -83,20 +96,16 @@ const buildColumns = (dateColumns) => {
     },
   });
 
-  columns.push(
-    {
-      title: "Forecasted snowfall days",
-      field: "Forecasted snowfall days",
-      hozAlign: "center",
-      headerHozAlign: "center",
-      sorter: "number",
-    },
-    {
-      title: "Last updated",
-      field: "Last_Updated",
-      headerSort: false,
-    }
-  );
+  columns.push({
+    title: "Snow days",
+    field: "Forecasted snowfall days",
+    hozAlign: "center",
+    headerHozAlign: "center",
+    sorter: "number",
+    cssClass: "forecast-meta",
+    width: 110,
+    minWidth: 90,
+  });
 
   return columns;
 };
@@ -137,9 +146,9 @@ const renderTable = (rows) => {
 
   const table = new Tabulator("#forecast-table", {
     data: rows,
-    layout: "fitColumns",
+    layout: "fitDataTable",
     height: "70vh",
-    rowHeight: 44,
+    rowHeight: 52,
     columns: buildColumns(dateColumns),
     initialSort: [{ column: "Five-day total", dir: "desc" }],
   });
