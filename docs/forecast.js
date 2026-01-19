@@ -44,9 +44,9 @@ const buildColumns = (dateColumns) => {
       frozen: true,
       headerSort: true,
       cssClass: "resort-col",
-      width: 170,
-      minWidth: 140,
-      maxWidth: 210,
+      width: 150,
+      minWidth: 120,
+      maxWidth: 180,
     },
   ];
 
