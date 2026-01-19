@@ -82,6 +82,8 @@ const buildColumns = (dateColumns) => {
 
   columns.push({
     title: "5-day total",
+    titleFormatter: () =>
+      `<span class="date-header"><span class="date-dow">5-day</span><span class="date-md">total</span></span>`,
     field: "Five-day total",
     hozAlign: "center",
     headerHozAlign: "center",
