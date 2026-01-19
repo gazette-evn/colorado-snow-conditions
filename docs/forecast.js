@@ -9,7 +9,10 @@ const formatDateLabel = (value) => {
   const [month, day, year] = value.split("/").map(Number);
   const date = new Date(year, month - 1, day);
   const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
-  return `${weekday} ${month}/${day}`;
+  return {
+    weekday,
+    monthDay: `${month}/${day}`,
+  };
 };
 
 const scaledHeight = (value, maxValue) => {
@@ -40,14 +43,19 @@ const buildColumns = (dateColumns) => {
       field: "Resort",
       frozen: true,
       headerSort: true,
-      width: 220,
-      minWidth: 180,
+      cssClass: "resort-col",
+      width: 170,
+      minWidth: 140,
+      maxWidth: 210,
     },
   ];
 
   dateColumns.forEach((date) => {
+    const { weekday, monthDay } = formatDateLabel(date);
     columns.push({
-      title: formatDateLabel(date),
+      title: `${weekday} ${monthDay}`,
+      titleFormatter: () =>
+        `<span class="date-header"><span class="date-dow">${weekday}</span><span class="date-md">${monthDay}</span></span>`,
       field: date,
       hozAlign: "center",
       headerHozAlign: "center",
@@ -79,8 +87,8 @@ const buildColumns = (dateColumns) => {
     headerHozAlign: "center",
     sorter: "number",
     cssClass: "forecast-total",
-    width: 120,
-    minWidth: 110,
+    width: 100,
+    minWidth: 90,
     formatter: (cell) => {
       const value = roundToHalf(cell.getValue());
       const klass = snowClass(value);
@@ -103,8 +111,8 @@ const buildColumns = (dateColumns) => {
     headerHozAlign: "center",
     sorter: "number",
     cssClass: "forecast-meta",
-    width: 110,
-    minWidth: 90,
+    width: 90,
+    minWidth: 80,
   });
 
   return columns;

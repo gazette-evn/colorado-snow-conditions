@@ -145,6 +145,16 @@ body {
   padding: 8px 16px;
 }
 
+.tabulator .tabulator-col.resort-col .tabulator-col-content,
+.tabulator .tabulator-cell.resort-col {
+  padding: 8px 10px;
+}
+
+.tabulator .tabulator-cell.resort-col {
+  white-space: normal;
+  line-height: 1.2;
+}
+
 .tabulator .tabulator-col.forecast-day {
   border-right: none;
 }
@@ -164,6 +174,22 @@ body {
 
 .tabulator .tabulator-cell.forecast-meta {
   padding: 6px 8px;
+}
+
+.date-header {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+
+.date-dow {
+  font-weight: 600;
+}
+
+.date-md {
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .tabulator .tabulator-col.tabulator-sortable .tabulator-col-title {
@@ -253,6 +279,10 @@ body {
   }
 
   #forecast-table {
-    min-width: 860px;
+    min-width: 780px;
+  }
+
+  .tabulator .tabulator-cell.resort-col {
+    font-size: 12.5px;
   }
 }
