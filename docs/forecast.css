@@ -146,7 +146,8 @@ body {
 }
 
 .tabulator-row.tabulator-row-even {
-  background-color: #ffffff;
+  background-color: transparent !important;
+  background: none !important;
 }
 
 .tabulator .tabulator-header .tabulator-col {
@@ -167,6 +168,21 @@ body {
 .tabulator-col[tabulator-field=""],
 .tabulator-cell[tabulator-field=""] {
   display: none !important;
+}
+
+.tabulator .tabulator-col:last-child:empty,
+.tabulator .tabulator-cell:last-child:empty {
+  display: none !important;
+  width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.tabulator-col.tabulator-frozen:last-child + .tabulator-col {
+  display: none !important;
+  width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .tabulator .tabulator-header .tabulator-col-title {
@@ -211,14 +227,17 @@ body {
 .tabulator .tabulator-cell.resort-col {
   white-space: normal;
   line-height: 1.2;
+  border-right: none !important;
 }
 
 .tabulator .tabulator-col.resort-col .tabulator-col-content {
-  justify-content: center;
+  justify-content: center !important;
+  text-align: center !important;
+  display: flex !important;
 }
 
 .tabulator .tabulator-col.resort-col .tabulator-col-title {
-  text-align: center;
+  text-align: center !important;
   width: 100%;
   display: block;
 }
