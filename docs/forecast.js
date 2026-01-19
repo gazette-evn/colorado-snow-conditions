@@ -198,7 +198,18 @@ const loadForecast = () => {
     header: true,
     dynamicTyping: true,
     complete: (results) => {
-      const rows = results.data.filter((row) => row.Resort);
+      const rows = results.data
+        .filter((row) => row.Resort)
+        .map((row) => {
+          // Remove any empty string keys
+          const cleaned = {};
+          Object.keys(row).forEach((key) => {
+            if (key && key.trim() !== "") {
+              cleaned[key] = row[key];
+            }
+          });
+          return cleaned;
+        });
       if (!rows.length) return;
       updateLastUpdated(rows);
       renderTable(rows);
