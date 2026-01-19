@@ -22,7 +22,7 @@ body {
   font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
   background: var(--bg);
-  font-size: clamp(11px, 1.4vw, 14px);
+  font-size: clamp(10px, 1.2vw, 13px);
 }
 
 .page-header {
@@ -30,6 +30,9 @@ body {
   flex-direction: column;
   gap: 8px;
   margin-bottom: 16px;
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .page-header h1 {
@@ -52,6 +55,9 @@ body {
   margin-bottom: 16px;
   font-size: clamp(12px, 1.3vw, 13px);
   color: var(--muted);
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .legend-item {
@@ -146,7 +152,7 @@ body {
 }
 
 .tabulator-row.tabulator-row-even {
-  background-color: #fafafa;
+  background-color: #fcfcfc;
 }
 
 .tabulator .tabulator-header .tabulator-col {
@@ -160,8 +166,8 @@ body {
 }
 
 .tabulator .tabulator-header .tabulator-col-title {
-  font-size: clamp(11px, 1.2vw + 6px, 13px);
-  font-weight: 400;
+  font-size: clamp(10px, 1vw + 5px, 12px);
+  font-weight: 600;
   overflow: visible !important;
   text-overflow: clip !important;
   white-space: normal !important;
@@ -172,6 +178,7 @@ body {
   font-size: inherit;
   color: var(--text);
   border-right: 1px solid var(--border);
+  font-weight: 400;
 }
 
 .tabulator .tabulator-cell:last-child {
@@ -298,7 +305,7 @@ body {
 }
 
 .snow-value {
-  font-weight: 600;
+  font-weight: 400;
   font-size: 0.9em;
 }
 
