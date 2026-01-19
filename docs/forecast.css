@@ -157,11 +157,21 @@ body {
 .tabulator .tabulator-header .tabulator-col {
   background: transparent;
   color: var(--text);
-  border-right: 1px solid var(--border);
+  border-right: none !important;
 }
 
 .tabulator .tabulator-header .tabulator-col:last-child {
-  border-right: none;
+  border-right: none !important;
+}
+
+.tabulator .tabulator-header .tabulator-col.resort-col {
+  text-align: center !important;
+}
+
+.tabulator .tabulator-header .tabulator-col.resort-col .tabulator-col-content,
+.tabulator .tabulator-header .tabulator-col.resort-col .tabulator-col-title {
+  text-align: center !important;
+  justify-content: center !important;
 }
 
 .tabulator .tabulator-header .tabulator-col:empty,
@@ -195,6 +205,19 @@ body {
   visibility: hidden !important;
   width: 0 !important;
   max-width: 0 !important;
+}
+
+.tabulator-col.forecast-meta:last-child,
+.tabulator-cell.forecast-meta:last-child {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  max-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.tabulator .tabulator-col:nth-last-child(-n+1) {
+  max-width: 90px !important;
 }
 
 .tabulator .tabulator-header .tabulator-col-title {
