@@ -133,11 +133,7 @@ body {
 .tabulator .tabulator-header {
   border-left: none;
   border-right: none;
-  background: #ffffff;
-}
-
-.tabulator .tabulator-header {
-  background: #ffffff;
+  background: transparent;
   font-weight: 400;
   border-bottom: 2px solid #333333;
 }
@@ -161,6 +157,11 @@ body {
 
 .tabulator .tabulator-header .tabulator-col:last-child {
   border-right: none;
+}
+
+.tabulator .tabulator-header .tabulator-col:empty,
+.tabulator .tabulator-cell:empty {
+  display: none !important;
 }
 
 .tabulator .tabulator-header .tabulator-col-title {
