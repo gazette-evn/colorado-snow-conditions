@@ -22,7 +22,7 @@ body {
   font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
   background: var(--bg);
-  font-size: clamp(12px, 1.6vw, 14px);
+  font-size: clamp(11px, 1.4vw, 14px);
 }
 
 .page-header {
@@ -69,7 +69,7 @@ body {
 }
 
 #forecast-table {
-  min-width: 900px;
+  min-width: 0;
 }
 
 .swatch {
@@ -100,6 +100,7 @@ body {
   border-radius: 0;
   box-shadow: none;
   overflow: hidden;
+  width: max-content;
 }
 
 .tabulator .tabulator-header {
@@ -127,7 +128,7 @@ body {
 }
 
 .tabulator .tabulator-header .tabulator-col-title {
-  font-size: 14px;
+  font-size: clamp(11px, 1.2vw + 6px, 13px);
   font-weight: 400;
 }
 
@@ -175,6 +176,11 @@ body {
   border-right: none;
 }
 
+.tabulator .tabulator-col.forecast-total,
+.tabulator .tabulator-cell.forecast-total {
+  border-left: 2px solid #333333;
+}
+
 .tabulator .tabulator-cell.forecast-total {
   padding: 6px 8px;
 }
@@ -200,7 +206,7 @@ body {
 }
 
 .tabulator .tabulator-col.tabulator-sortable .tabulator-col-title {
-  padding-right: 14px;
+  padding-right: 10px;
 }
 
 .tabulator .tabulator-col .tabulator-col-sorter {
@@ -211,21 +217,21 @@ body {
 .tabulator .tabulator-col[aria-sort="descending"] .tabulator-col-title::after {
   content: "";
   position: absolute;
-  right: 6px;
+  right: 4px;
   top: 50%;
   transform: translateY(-50%);
   width: 0;
   height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
 }
 
 .tabulator .tabulator-col[aria-sort="ascending"] .tabulator-col-title::after {
-  border-bottom: 6px solid #333333;
+  border-bottom: 5px solid #333333;
 }
 
 .tabulator .tabulator-col[aria-sort="descending"] .tabulator-col-title::after {
-  border-top: 6px solid #333333;
+  border-top: 5px solid #333333;
 }
 
 .tabulator .tabulator-col-title {

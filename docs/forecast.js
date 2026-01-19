@@ -44,9 +44,9 @@ const buildColumns = (dateColumns) => {
       frozen: true,
       headerSort: true,
       cssClass: "resort-col",
-      width: 150,
-      minWidth: 120,
-      maxWidth: 180,
+      width: 135,
+      minWidth: 110,
+      maxWidth: 170,
     },
   ];
 
@@ -62,8 +62,8 @@ const buildColumns = (dateColumns) => {
       headerSort: true,
       sorter: "number",
       cssClass: "forecast-day",
-      width: 90,
-      minWidth: 80,
+      width: 78,
+      minWidth: 70,
       formatter: (cell) => {
         const value = roundToHalf(cell.getValue());
         const klass = snowClass(value);
@@ -87,8 +87,8 @@ const buildColumns = (dateColumns) => {
     headerHozAlign: "center",
     sorter: "number",
     cssClass: "forecast-total",
-    width: 100,
-    minWidth: 90,
+    width: 96,
+    minWidth: 86,
     formatter: (cell) => {
       const value = roundToHalf(cell.getValue());
       const klass = snowClass(value);
@@ -106,6 +106,8 @@ const buildColumns = (dateColumns) => {
 
   columns.push({
     title: "Snow days",
+    titleFormatter: () =>
+      `<span class="date-header"><span class="date-dow">Snow</span><span class="date-md">days</span></span>`,
     field: "Forecasted snowfall days",
     hozAlign: "center",
     headerHozAlign: "center",
