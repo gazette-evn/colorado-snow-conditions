@@ -142,7 +142,7 @@ const handleSort = (column) => {
 const filterData = (data, searchTerm) => {
   if (!searchTerm) return data;
   const term = searchTerm.toLowerCase();
-  return data.filter((row) => row.Resort.toLowerCase().includes(term));
+  return data.filter((row) => row.Resort.toLowerCase().startsWith(term));
 };
 
 const loadForecast = () => {
@@ -181,6 +181,13 @@ const loadForecast = () => {
       
       // Initial render (sorted descending by 5-day total)
       currentSort.column = "total";
+      currentSort.dir = "desc";
+      
+      // Calculate totals first
+      rows.forEach(row => {
+        row._total = dateColumns.reduce((sum, col) => sum + (Number(row[col]) || 0), 0);
+      });
+      
       const sorted = sortData(rows, currentSort.column, "desc");
       renderTable(sorted, dateColumns);
       
