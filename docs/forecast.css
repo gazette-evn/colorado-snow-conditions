@@ -67,17 +67,26 @@ body {
 }
 
 .table-wrapper {
-  max-width: 980px;
-  margin: 0 auto;
+  width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 6px;
-  display: flex;
-  justify-content: center;
 }
 
 #forecast-table {
   min-width: 0;
+  margin: 0 auto;
+  max-width: 980px;
+}
+
+.source-footer {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .swatch {
@@ -213,21 +222,15 @@ body {
   max-width: 0 !important;
 }
 
-.tabulator-col.forecast-meta:last-child,
-.tabulator-cell.forecast-meta:last-child {
-  display: none !important;
-  visibility: hidden !important;
-  width: 0 !important;
-  max-width: 0 !important;
-  overflow: hidden !important;
-}
-
-.tabulator .tabulator-col:nth-last-child(-n+1) {
-  max-width: 90px !important;
-}
-
 .tabulator {
   margin: 0 auto;
+  max-width: 100%;
+}
+
+@media (min-width: 521px) {
+  .tabulator {
+    max-width: 980px;
+  }
 }
 
 .tabulator .tabulator-header .tabulator-col-title {
@@ -434,11 +437,11 @@ body {
   }
 
   #forecast-table {
-    min-width: 780px;
+    min-width: 0;
   }
 
   .tabulator .tabulator-cell.resort-col {
-    font-size: 0.95em;
+    font-size: 11px;
   }
 }
 
@@ -450,6 +453,10 @@ body {
 
   .tabulator .tabulator-cell {
     padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .tabulator .tabulator-cell.resort-col {
     font-size: 11px;
   }
 
@@ -465,9 +472,11 @@ body {
     height: 26px;
   }
 
-  .tabulator .tabulator-cell,
-  .tabulator .tabulator-header .tabulator-col-title {
-    font-size: 11px;
+  .tabulator .tabulator-col.forecast-total,
+  .tabulator .tabulator-cell.forecast-total,
+  .tabulator .tabulator-col.forecast-meta,
+  .tabulator .tabulator-cell.forecast-meta {
+    display: none !important;
   }
 }
 
