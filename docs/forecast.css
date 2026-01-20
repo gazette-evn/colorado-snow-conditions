@@ -22,7 +22,7 @@ body {
 }
 
 .container {
-  max-width: 980px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 28px 20px;
   font-size: clamp(12px, 1.4vw, 14px);
@@ -40,6 +40,25 @@ body {
 
 .meta {
   color: var(--muted);
+}
+
+.search-wrapper {
+  margin-bottom: 16px;
+}
+
+#search-input {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+#search-input:focus {
+  outline: none;
+  border-color: #2f6fe0;
 }
 
 .legend {
@@ -104,6 +123,11 @@ th {
 
 th:first-child {
   text-align: center;
+}
+
+th.total-column,
+td.total-column {
+  border-left: 2px solid #333333;
 }
 
 th.sorted-asc::after,

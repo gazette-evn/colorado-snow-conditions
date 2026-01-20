@@ -64,11 +64,17 @@ const renderDayCell = (value) => {
 
 const sortData = (data, column, dir) => {
   return [...data].sort((a, b) => {
-    const aVal = column === "Resort" ? a[column] : Number(a[column]) || 0;
-    const bVal = column === "Resort" ? b[column] : Number(b[column]) || 0;
-    
+    let aVal, bVal;
     if (column === "Resort") {
+      aVal = a[column];
+      bVal = b[column];
       return dir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+    } else if (column === "total") {
+      aVal = a._total || 0;
+      bVal = b._total || 0;
+    } else {
+      aVal = Number(a[column]) || 0;
+      bVal = Number(b[column]) || 0;
     }
     return dir === "asc" ? aVal - bVal : bVal - aVal;
   });
@@ -84,6 +90,7 @@ const renderTable = (data, dateColumns) => {
     const { weekday, monthDay } = formatDateHeader(col);
     headers += `<th data-column="${col}">${weekday}<br>${monthDay}</th>`;
   });
+  headers += `<th data-column="total" class="total-column">5-day<br>total</th>`;
   headerRow.innerHTML = headers;
   
   // Render rows
@@ -93,6 +100,10 @@ const renderTable = (data, dateColumns) => {
       dateColumns.forEach((col) => {
         cells += `<td>${renderDayCell(row[col])}</td>`;
       });
+      // Calculate 5-day total
+      const total = dateColumns.reduce((sum, col) => sum + (Number(row[col]) || 0), 0);
+      cells += `<td class="total-column">${renderDayCell(total)}</td>`;
+      row._total = total; // Store for sorting
       return `<tr>${cells}</tr>`;
     })
     .join("");
@@ -103,6 +114,11 @@ const renderTable = (data, dateColumns) => {
     if (th.dataset.column === currentSort.column) {
       th.classList.add(`sorted-${currentSort.dir}`);
     }
+  });
+  
+  // Re-attach click handlers
+  document.querySelectorAll("th[data-column]").forEach((th) => {
+    th.addEventListener("click", () => handleSort(th.dataset.column));
   });
 };
 
@@ -121,6 +137,12 @@ const handleSort = (column) => {
   
   const sorted = sortData(currentData, column, currentSort.dir);
   renderTable(sorted, dateColumns);
+};
+
+const filterData = (data, searchTerm) => {
+  if (!searchTerm) return data;
+  const term = searchTerm.toLowerCase();
+  return data.filter((row) => row.Resort.toLowerCase().includes(term));
 };
 
 const loadForecast = () => {
@@ -157,14 +179,17 @@ const loadForecast = () => {
         .sort()
         .slice(0, 5);
       
-      // Initial render (sorted descending by first date column)
-      currentSort.column = dateColumns[dateColumns.length - 1];
+      // Initial render (sorted descending by 5-day total)
+      currentSort.column = "total";
       const sorted = sortData(rows, currentSort.column, "desc");
       renderTable(sorted, dateColumns);
       
-      // Add click handlers
-      document.querySelectorAll("th[data-column]").forEach((th) => {
-        th.addEventListener("click", () => handleSort(th.dataset.column));
+      // Search functionality
+      document.getElementById("search-input").addEventListener("input", (e) => {
+        const searchTerm = e.target.value;
+        const filtered = filterData(currentData, searchTerm);
+        const sorted = sortData(filtered, currentSort.column, currentSort.dir);
+        renderTable(sorted, dateColumns);
       });
     },
     error: (error) => {
