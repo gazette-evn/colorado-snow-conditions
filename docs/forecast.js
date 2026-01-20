@@ -100,49 +100,6 @@ const buildColumns = (dateColumns, sizes) => {
     });
   });
 
-  columns.push({
-    title: "5-day total",
-    titleFormatter: () =>
-      `<span class="date-header"><span class="date-dow">5-day</span><span class="date-md">total</span></span>`,
-    field: "Five-day total",
-    hozAlign: "center",
-    headerHozAlign: "center",
-    headerSort: true,
-    headerSortStartingDir: "desc",
-    sorter: "number",
-    cssClass: "forecast-total",
-    width: sizes.totalWidth,
-    minWidth: sizes.totalMin,
-    formatter: (cell) => {
-      const value = roundToHalf(cell.getValue());
-      const klass = snowClass(value);
-      const height = scaledHeight(value, 20);
-      return `
-        <div class="snow-cell">
-          <div class="snow-value">${formatValue(value)}"</div>
-          <div class="snow-column">
-            <div class="snow-column-fill ${klass}" style="height:${height}%"></div>
-          </div>
-        </div>
-      `;
-    },
-  });
-
-  columns.push({
-    title: "Snow days",
-    titleFormatter: () =>
-      `<span class="date-header"><span class="date-dow">Snow</span><span class="date-md">days</span></span>`,
-    field: "Forecasted snowfall days",
-    hozAlign: "center",
-    headerHozAlign: "center",
-    headerSort: true,
-    headerSortStartingDir: "desc",
-    sorter: "number",
-    cssClass: "forecast-meta",
-    width: sizes.snowWidth,
-    minWidth: sizes.snowMin,
-  });
-
   return columns;
 };
 
