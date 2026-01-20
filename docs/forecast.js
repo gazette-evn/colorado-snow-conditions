@@ -183,7 +183,7 @@ const renderTable = (rows) => {
   const sizes = getLayoutSizes();
   const table = new Tabulator("#forecast-table", {
     data: rows,
-    layout: "fitDataTable",
+    layout: "fitColumns",
     rowHeight: sizes.rowHeight,
     columns: buildColumns(dateColumns, sizes),
     initialSort: [{ column: "Five-day total", dir: "desc" }],
