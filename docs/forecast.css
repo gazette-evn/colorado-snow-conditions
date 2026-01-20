@@ -1,10 +1,7 @@
 :root {
-  color-scheme: light;
   --text: #181818;
   --muted: #6b7280;
   --border: #e0e0e0;
-  --bg: #ffffff;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   --snow-0: #f3f4f6;
   --snow-1-2: #cfe3ff;
   --snow-3-6: #7fb3ff;
@@ -21,7 +18,7 @@ body {
   padding: 0;
   font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
-  background: var(--bg);
+  background: #ffffff;
 }
 
 .container {
@@ -32,22 +29,16 @@ body {
 }
 
 .page-header {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .page-header h1 {
-  margin: 0;
-  font-size: clamp(20px, 2.6vw, 26px);
+  margin: 0 0 8px 0;
+  font-size: clamp(22px, 2.6vw, 28px);
   font-weight: 600;
 }
 
 .meta {
-  display: flex;
-  gap: 16px;
-  font-size: clamp(12px, 1.3vw, 13px);
   color: var(--muted);
 }
 
@@ -65,16 +56,6 @@ body {
   gap: 6px;
 }
 
-#forecast-table {
-  width: 100%;
-  margin-bottom: 16px;
-}
-
-.source-footer {
-  margin-top: 16px;
-  color: var(--muted);
-}
-
 .swatch {
   width: 16px;
   height: 12px;
@@ -82,264 +63,51 @@ body {
   border: 1px solid var(--border);
 }
 
-.snow-0 {
-  background: var(--snow-0);
-}
-.snow-1-2 {
-  background: var(--snow-1-2);
-}
-.snow-3-6 {
-  background: var(--snow-3-6);
-}
-.snow-7-10 {
-  background: var(--snow-7-10);
-}
-.snow-10-plus {
-  background: var(--snow-10-plus);
-}
+.snow-0 { background: var(--snow-0); }
+.snow-1-2 { background: var(--snow-1-2); }
+.snow-3-6 { background: var(--snow-3-6); }
+.snow-7-10 { background: var(--snow-7-10); }
+.snow-10-plus { background: var(--snow-10-plus); }
 
-.tabulator {
-  border: none !important;
-  border-radius: 0;
-  box-shadow: none;
+.table-scroll {
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 16px;
 }
 
-.tabulator,
-.tabulator .tabulator-header,
-.tabulator .tabulator-tableholder,
-.tabulator .tabulator-table,
-.tabulator-row,
-.tabulator-row:first-child,
-.tabulator-row:last-child {
-  border: none !important;
-  outline: none !important;
-  border-left: none !important;
-  border-right: none !important;
-  border-top: none !important;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: inherit;
 }
 
-.tabulator .tabulator-tableholder {
-  border: none !important;
-  background: transparent !important;
-  width: max-content !important;
+thead {
+  background: #ffffff;
 }
 
-.tabulator .tabulator-header {
-  border-left: none;
-  border-right: none;
-  background: #ffffff !important;
-  font-weight: 400;
-  border-bottom: 2px solid #333333 !important;
-}
-
-.tabulator .tabulator-tableholder {
-  background: #ffffff !important;
-}
-
-.tabulator .tabulator-headers {
-  background: #ffffff !important;
-}
-
-.tabulator-row {
-  border-bottom: 1px solid var(--border);
-  border-left: none;
-  border-right: none;
-  background-clip: padding-box;
-}
-
-.tabulator-row.tabulator-row-even {
-  background-color: rgba(0, 0, 0, 0.027) !important;
-  background: rgba(0, 0, 0, 0.027) !important;
-}
-
-.tabulator .tabulator-header .tabulator-col {
-  background: #ffffff !important;
-  color: var(--text);
-  border-right: none !important;
-}
-
-.tabulator .tabulator-header .tabulator-col:last-child {
-  border-right: none !important;
-}
-
-.tabulator .tabulator-header .tabulator-col.resort-col {
-  text-align: center !important;
-}
-
-.tabulator .tabulator-header .tabulator-col.resort-col .tabulator-col-content,
-.tabulator .tabulator-header .tabulator-col.resort-col .tabulator-col-title {
-  text-align: center !important;
-  justify-content: center !important;
-}
-
-.tabulator .tabulator-header .tabulator-col:empty,
-.tabulator .tabulator-cell:empty {
-  display: none !important;
-}
-
-.tabulator-col[tabulator-field=""],
-.tabulator-cell[tabulator-field=""] {
-  display: none !important;
-}
-
-.tabulator .tabulator-col:last-child:empty,
-.tabulator .tabulator-cell:last-child:empty {
-  display: none !important;
-  width: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.tabulator-col.tabulator-frozen:last-child + .tabulator-col {
-  display: none !important;
-  width: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-.tabulator-col:last-of-type:not([tabulator-field]),
-.tabulator-cell:last-of-type:empty {
-  display: none !important;
-  visibility: hidden !important;
-  width: 0 !important;
-  max-width: 0 !important;
-}
-
-.tabulator {
-  margin: 0 auto;
-  max-width: 100%;
-}
-
-@media (min-width: 521px) {
-  .tabulator {
-    max-width: 980px;
-  }
-}
-
-.tabulator .tabulator-header .tabulator-col-title {
-  font-size: 13px;
-  font-weight: 600;
-  overflow: visible !important;
-  text-overflow: clip !important;
-  white-space: normal !important;
-}
-
-.tabulator .tabulator-cell {
-  padding: 8px 16px;
-  font-size: 13px;
-  color: var(--text);
-  border-right: none !important;
-  border-left: none !important;
-  font-weight: 400;
-}
-
-.tabulator .tabulator-cell:last-child {
-  border-right: none !important;
-}
-
-.tabulator .tabulator-table {
-  border: none !important;
-}
-
-.tabulator .tabulator-row .tabulator-cell.tabulator-filler {
-  display: none !important;
-}
-
-.tabulator .tabulator-row .tabulator-cell:last-child {
-  border-right: none !important;
-}
-
-.tabulator .tabulator-col .tabulator-col-content {
-  padding: 8px 16px;
+th {
+  padding: 8px 12px;
   text-align: center;
-  justify-content: center;
-}
-
-.tabulator .tabulator-col.resort-col .tabulator-col-content,
-.tabulator .tabulator-cell.resort-col {
-  padding: 8px 10px;
-}
-
-.tabulator .tabulator-cell.resort-col {
-  white-space: normal;
-  line-height: 1.2;
-  border-right: none !important;
-  background: transparent !important;
-}
-
-.tabulator .tabulator-col.resort-col .tabulator-col-content {
-  justify-content: center !important;
-  text-align: center !important;
-  display: flex !important;
-}
-
-.tabulator .tabulator-col.resort-col .tabulator-col-title {
-  text-align: center !important;
-  width: 100%;
-  display: block;
-}
-
-.tabulator .tabulator-header .tabulator-col.resort-col {
+  font-weight: 600;
+  font-size: inherit;
+  border-bottom: 2px solid #333333;
+  border-left: none;
   border-right: none;
+  border-top: none;
+  background: #ffffff;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
 }
 
-.tabulator .tabulator-col.forecast-day {
-  border-right: none;
+th:first-child {
+  text-align: center;
 }
 
-.tabulator .tabulator-col.forecast-day .tabulator-col-content {
-  padding: 6px 6px;
-}
-
-.tabulator .tabulator-cell.forecast-day {
-  padding: 6px 4px;
-  border-right: none;
-}
-
-.tabulator .tabulator-col.forecast-total,
-.tabulator .tabulator-cell.forecast-total {
-  border-left: 2px solid #333333;
-}
-
-.tabulator .tabulator-cell.forecast-total {
-  padding: 6px 8px;
-}
-
-.tabulator .tabulator-cell.forecast-meta {
-  padding: 6px 8px;
-}
-
-.date-header {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1.1;
-}
-
-.date-dow {
-  font-weight: 500;
-  color: var(--text);
-}
-
-.date-md {
-  font-size: 12px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.tabulator .tabulator-col.tabulator-sortable .tabulator-col-title {
-  padding-right: 0 !important;
-  display: inline-block;
-  width: 100%;
-}
-
-.tabulator .tabulator-col .tabulator-col-sorter {
-  display: none;
-}
-
-.tabulator .tabulator-col[aria-sort="ascending"] .tabulator-col-title::after,
-.tabulator .tabulator-col[aria-sort="descending"] .tabulator-col-title::after {
+th.sorted-asc::after,
+th.sorted-desc::after {
   content: "";
   position: absolute;
   right: 6px;
@@ -349,133 +117,97 @@ body {
   height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  margin: 0 !important;
 }
 
-.tabulator .tabulator-col[aria-sort="ascending"] .tabulator-col-title::after {
+th.sorted-asc::after {
   border-bottom: 7px solid #2f6fe0;
 }
 
-.tabulator .tabulator-col[aria-sort="descending"] .tabulator-col-title::after {
+th.sorted-desc::after {
   border-top: 7px solid #2f6fe0;
 }
 
-.tabulator .tabulator-arrow,
-.tabulator .tabulator-col-sorter {
-  display: none !important;
+td {
+  padding: 8px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  border-left: none;
+  border-right: none;
+  font-size: inherit;
 }
 
-.tabulator .tabulator-col-title {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  text-align: center !important;
+td:first-child {
+  text-align: left;
+  white-space: normal;
 }
 
-.snow-cell {
+tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.027);
+}
+
+.day-cell {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  width: 100%;
-  height: 100%;
 }
 
-.snow-value {
+.day-value {
   font-weight: 400;
-  font-size: 0.9em;
 }
 
-.snow-column {
+.day-bar {
   width: 100%;
+  max-width: 60px;
   height: 32px;
-  background: transparent;
-  border-radius: 0;
   display: flex;
   align-items: flex-end;
-  overflow: hidden;
 }
 
-.snow-column-fill {
+.day-bar-fill {
   width: 100%;
 }
 
-.snow-column-fill.snow-0 {
-  background: var(--snow-0);
-}
-.snow-column-fill.snow-1-2 {
-  background: var(--snow-1-2);
-}
-.snow-column-fill.snow-3-6 {
-  background: var(--snow-3-6);
-}
-.snow-column-fill.snow-7-10 {
-  background: var(--snow-7-10);
-}
-.snow-column-fill.snow-10-plus {
-  background: var(--snow-10-plus);
+.source-footer {
+  margin-top: 16px;
+  color: var(--muted);
 }
 
-@media (max-width: 900px) {
-  body {
-    padding: 14px;
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 16px;
+    font-size: 12px;
   }
 
   .page-header h1 {
-    font-size: 22px;
+    font-size: 24px;
   }
 
-  #forecast-table {
-    min-width: 0;
+  th, td {
+    padding: 6px 8px;
   }
 
-  .tabulator .tabulator-cell.resort-col {
-    font-size: 11px;
+  .day-bar {
+    height: 24px;
   }
 }
 
 @media (max-width: 520px) {
-  body {
-    padding: 12px;
+  .container {
+    padding: 16px 12px;
     font-size: 11px;
   }
 
-  .tabulator .tabulator-cell {
-    padding: 6px 8px;
-    font-size: 11px;
+  .page-header h1 {
+    font-size: 20px;
   }
 
-  .tabulator .tabulator-cell.resort-col {
-    font-size: 11px;
+  th, td {
+    padding: 6px 6px;
   }
 
-  .tabulator .tabulator-col .tabulator-col-content {
-    padding: 6px 8px;
-  }
-
-  .tabulator .tabulator-header .tabulator-col-title {
-    font-size: 11px;
-  }
-
-  .snow-column {
-    height: 26px;
-  }
-
-  .tabulator .tabulator-col.forecast-total,
-  .tabulator .tabulator-cell.forecast-total,
-  .tabulator .tabulator-col.forecast-meta,
-  .tabulator .tabulator-cell.forecast-meta {
-    display: none !important;
-  }
-}
-
-@media (max-width: 420px) {
-  body {
-    font-size: 11px;
-  }
-
-  .tabulator .tabulator-cell,
-  .tabulator .tabulator-header .tabulator-col-title {
-    font-size: 0.86em;
+  .day-bar {
+    max-width: 40px;
+    height: 22px;
   }
 }

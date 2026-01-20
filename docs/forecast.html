@@ -3,16 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Colorado Snow Forecast Table</title>
+    <title>Colorado Snow Forecast</title>
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap"
     />
-    <link rel="stylesheet" href="forecast.css?v=24" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator.min.css"
-    />
+    <link rel="stylesheet" href="forecast.css" />
   </head>
   <body>
     <div class="container">
@@ -31,14 +27,19 @@
         <div class="legend-item"><span class="swatch snow-10-plus"></span>10"+</div>
       </section>
 
-      <main>
-        <div id="forecast-table"></div>
-        <div class="source-footer">Source: Open-Meteo</div>
-      </main>
+      <div class="table-scroll">
+        <table id="forecast-table">
+          <thead>
+            <tr id="header-row"></tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="source-footer">Source: Open-Meteo</div>
     </div>
 
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
-    <script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
-    <script src="forecast.js?v=24"></script>
+    <script src="forecast.js"></script>
   </body>
 </html>
