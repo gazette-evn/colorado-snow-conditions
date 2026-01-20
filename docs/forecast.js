@@ -16,8 +16,8 @@ const formatValue = (value) => {
 const snowClass = (value) => {
   const amount = roundToHalf(value);
   if (amount <= 0) return "snow-0";
-  if (amount <= 2) return "snow-1-2";
-  if (amount <= 6) return "snow-3-6";
+  if (amount < 2) return "snow-1-2";
+  if (amount < 6) return "snow-3-6";
   if (amount <= 10) return "snow-7-10";
   return "snow-10-plus";
 };

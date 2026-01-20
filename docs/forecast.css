@@ -2,10 +2,10 @@
   --text: #181818;
   --muted: #6b7280;
   --border: #e0e0e0;
-  --snow-0: #cfe3ff;
-  --snow-1-2: #7fb3ff;
+  --snow-0: #d6e9ff;
+  --snow-1-2: #8fc2ff;
   --snow-3-6: #4a9aff;
-  --snow-7-10: #2f6fe0;
+  --snow-7-10: #2470cc;
   --snow-10-plus: #0f3d91;
 }
 
@@ -101,6 +101,11 @@ thead {
   position: sticky;
   top: 0;
   z-index: 10;
+  background: #ffffff;
+}
+
+thead tr {
+  box-shadow: 0 2px 0 0 #333333;
 }
 
 table {
@@ -149,6 +154,21 @@ th.sorted-desc::after {
   height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
+}
+
+@media (max-width: 768px) {
+  th.sorted-asc::after,
+  th.sorted-desc::after {
+    position: static;
+    display: inline-block;
+    margin-left: 4px;
+    transform: none;
+  }
+  
+  th.sorted-desc::after {
+    transform: rotate(180deg);
+    display: inline-block;
+  }
 }
 
 th.sorted-asc::after {
