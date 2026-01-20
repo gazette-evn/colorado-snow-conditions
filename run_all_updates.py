@@ -36,7 +36,7 @@ def run_script(script_name, description):
             [sys.executable, script_name],
             capture_output=True,
             text=True,
-            timeout=300  # 5 minute timeout per script
+            timeout=600  # Increased to 10 minutes to handle detailed scraping
         )
         
         if result.returncode == 0:

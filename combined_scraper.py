@@ -327,8 +327,14 @@ def combine_resort_data():
     logger.info("FINAL COMBINED RESULTS")
     logger.info("="*70)
     logger.info(f"Total unique resorts: {len(combined_df)}")
-    logger.info(f"From OnTheSnow: {len(combined_df[combined_df['source'].str.contains('OnTheSnow', na=False)])}")
-    logger.info(f"From CSCUSA: {len(combined_df[combined_df['source'].str.contains('CSCUSA', na=False)])}")
+    
+    if 'source' in combined_df.columns:
+        ots_count = len(combined_df[combined_df['source'].str.contains('OnTheSnow', na=False)])
+        aspen_count = len(combined_df[combined_df['source'].str.contains('Aspen Official', na=False)])
+        cscusa_count = len(combined_df[combined_df['source'].str.contains('CSCUSA', na=False)])
+        logger.info(f"From OnTheSnow: {ots_count}")
+        logger.info(f"From Aspen Official: {aspen_count}")
+        logger.info(f"From CSCUSA: {cscusa_count}")
     
     return combined_df
 

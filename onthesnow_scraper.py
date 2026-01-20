@@ -218,7 +218,7 @@ class OnTheSnowScraper:
                         logger.info(f"  -> Detail: {row['name']} ({detail_url})")
                         
                         self.driver.get(detail_url)
-                        time.sleep(3) # Wait for render
+                        time.sleep(2) # Reduced sleep for faster execution
                         
                         detail_html = self.driver.page_source
                         
