@@ -105,7 +105,17 @@ thead {
 }
 
 thead tr {
-  box-shadow: 0 1px 0 0 #000000;
+  box-shadow: 0 1px 0 0 #000000 !important;
+}
+
+@media (max-width: 768px) {
+  thead {
+    box-shadow: 0 1px 0 0 #000000 !important;
+  }
+  
+  th:not(:first-child) {
+    width: calc((100% - 90px) / 6);
+  }
 }
 
 table {
@@ -124,7 +134,7 @@ th {
   text-align: center;
   font-weight: 600;
   font-size: inherit;
-  border-bottom: 1px solid #000000;
+  border-bottom: 1px solid #000000 !important;
   border-left: none;
   border-right: none;
   border-top: none;
@@ -136,6 +146,11 @@ th {
 
 th:first-child {
   text-align: center;
+  width: auto;
+}
+
+th:not(:first-child) {
+  width: calc((100% - 120px) / 6);
 }
 
 th.total-column,
