@@ -169,7 +169,7 @@ const updateLastUpdated = (rows) => {
   if (lastUpdated) {
     const el = document.getElementById("last-updated");
     if (el) {
-      el.textContent = `Last updated: ${formatUpdated(lastUpdated)}`;
+      el.textContent = `Updated: ${formatUpdated(lastUpdated)}`;
     }
   }
 };
