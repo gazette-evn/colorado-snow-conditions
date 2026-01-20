@@ -15,10 +15,11 @@ const formatValue = (value) => {
 
 const snowClass = (value) => {
   const amount = roundToHalf(value);
-  if (amount <= 2) return "snow-0-2";
+  if (amount <= 1) return "snow-0-1";
+  if (amount <= 3) return "snow-1-3";
   if (amount <= 6) return "snow-3-6";
-  if (amount <= 10) return "snow-7-10";
-  return "snow-10-plus";
+  if (amount <= 12) return "snow-6-12";
+  return "snow-12-plus";
 };
 
 const scaledHeight = (value, maxValue = 10) => {
