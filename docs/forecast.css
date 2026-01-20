@@ -2,9 +2,9 @@
   --text: #181818;
   --muted: #6b7280;
   --border: #e0e0e0;
-  --snow-0: #f3f4f6;
-  --snow-1-2: #cfe3ff;
-  --snow-3-6: #7fb3ff;
+  --snow-0: #cfe3ff;
+  --snow-1-2: #7fb3ff;
+  --snow-3-6: #4a9aff;
   --snow-7-10: #2f6fe0;
   --snow-10-plus: #0f3d91;
 }
@@ -93,6 +93,14 @@ body {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 table {
@@ -127,7 +135,7 @@ th:first-child {
 
 th.total-column,
 td.total-column {
-  border-left: 2px solid #333333;
+  border-left: 1px solid #333333;
 }
 
 th.sorted-asc::after,
