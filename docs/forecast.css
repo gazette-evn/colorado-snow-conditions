@@ -102,17 +102,12 @@ thead {
   top: 0;
   z-index: 10;
   background: #ffffff;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
-thead::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: #000000;
-  z-index: 11;
+thead tr {
+  border-bottom: 1px solid #000000;
 }
 
 @media (max-width: 768px) {
@@ -158,18 +153,7 @@ th:not(:first-child) {
 
 th.total-column,
 td.total-column {
-  position: relative;
-}
-
-th.total-column::before,
-td.total-column::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: #9ca3af;
+  border-left: 1px solid #9ca3af !important;
 }
 
 th.sorted-asc::after,
