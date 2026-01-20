@@ -2,7 +2,7 @@
 """
 OnTheSnow Colorado Scraper
 Scrapes snow conditions for ALL Colorado ski resorts from OnTheSnow
-Primary data source - covers 23+ resorts including all major ones
+Primary data source - uses embedded JSON for robustness and detail
 """
 
 import os
@@ -15,9 +15,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from bs4 import BeautifulSoup
 import time
 import re
+import json
 
 # Setup logging
 logging.basicConfig(
@@ -31,7 +31,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class OnTheSnowScraper:
-    """Scrapes snow conditions from OnTheSnow.com for Colorado"""
+    """Scrapes snow conditions from OnTheSnow.com for Colorado using embedded JSON"""
     
     def __init__(self, headless=True):
         self.url = "https://www.onthesnow.com/colorado/skireport.html"
@@ -60,11 +60,12 @@ class OnTheSnowScraper:
             logger.error(f"Failed to initialize Chrome driver: {e}")
             raise
     
-    def fetch_page(self):
+    def fetch_page(self, url=None):
         """Load the page and wait for data to render"""
+        target_url = url or self.url
         try:
-            logger.info(f"Loading {self.url}")
-            self.driver.get(self.url)
+            logger.info(f"Loading {target_url}")
+            self.driver.get(target_url)
             
             # Wait for the page to load
             logger.info("Waiting for page to load...")
@@ -84,198 +85,103 @@ class OnTheSnowScraper:
             return html
             
         except Exception as e:
-            logger.error(f"Error fetching page: {e}")
+            logger.error(f"Error fetching page {target_url}: {e}")
             raise
     
-    def parse_snow_data(self, html):
-        """Parse the HTML to extract resort data"""
-        soup = BeautifulSoup(html, 'html.parser')
-        
-        resorts = []
-        
-        # OnTheSnow typically uses tables for resort data
-        # Look for table rows with resort information
-        
-        # Strategy 1: Find table with resort data
-        tables = soup.find_all('table')
-        logger.info(f"Found {len(tables)} tables")
-        
-        for table in tables:
-            rows = table.find_all('tr')
-            logger.info(f"Table has {len(rows)} rows")
-            
-            for row in rows:
-                cells = row.find_all(['td', 'th'])
-                if len(cells) >= 3:  # Enough data for a resort
-                    resort_data = self._extract_resort_from_row(cells, row)
-                    if resort_data:
-                        resorts.append(resort_data)
-        
-        # Strategy 2: Look for div-based layout (if no tables)
-        if not resorts:
-            logger.info("No table data found, looking for div structure")
-            # OnTheSnow might use divs with specific classes
-            resort_divs = soup.find_all('div', class_=lambda x: x and 'resort' in x.lower())
-            
-            for div in resort_divs:
-                resort_data = self._extract_resort_from_div(div)
-                if resort_data:
-                    resorts.append(resort_data)
-        
-        logger.info(f"Extracted {len(resorts)} resorts")
-        
-        return resorts
-    
-    def _extract_resort_from_row(self, cells, row):
-        """Extract resort data from table row - OnTheSnow specific structure"""
+    def parse_json_data(self, html):
+        """Extract resort data from __NEXT_DATA__ JSON"""
         try:
-            if not cells or len(cells) < 2:
-                return None
+            # Find the __NEXT_DATA__ script tag
+            match = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', html, re.DOTALL)
             
-            # First cell contains resort name
-            first_cell = cells[0]
+            if not match:
+                logger.error("Could not find __NEXT_DATA__ in HTML")
+                return []
             
-            # Find the resort name span (class="h4 styles_h4__x3zzi")
-            name_span = first_cell.find('span', class_=lambda x: x and 'h4' in x and 'styles_h4' in x)
-            if not name_span:
-                return None
+            # Parse JSON
+            data = json.loads(match.group(1))
             
-            name = name_span.get_text(strip=True)
+            # Navigate to resorts data
+            try:
+                resorts_data = data['props']['pageProps']['resorts']
+            except KeyError:
+                logger.warning("Could not find resorts data in JSON structure, checking alternative paths")
+                # Fallback paths if needed
+                return []
+
+            all_resorts = []
             
-            # Filter out header rows
-            if not name or len(name) < 3:
-                return None
-            if name.lower() in ['resort', 'name', 'location', 'open', 'closed', 'resort name']:
-                return None
+            # Loop through different status categories (1, 2, etc.)
+            for category_key, category_data in resorts_data.items():
+                resorts_list = category_data.get('data', [])
+                for resort_json in resorts_list:
+                    resort = self._parse_resort_json(resort_json)
+                    if resort:
+                        all_resorts.append(resort)
             
-            resort = {'name': name}
-            
-            # Check table type by counting cells
-            # Open table: 6 cols (name, 24h, 3day, base, trails, lifts)
-            # Closed table: 2 cols (name, opening date)
-            
-            if len(cells) >= 6:
-                # OPEN RESORT - has full data
-                resort['status'] = 'Open'
-                
-                # Column 1: 24h snowfall
-                snow_24h_span = cells[1].find('span', class_=lambda x: x and 'h4' in x)
-                resort['new_snow_24h'] = self._parse_measurement(snow_24h_span.get_text(strip=True)) if snow_24h_span else 0
-                
-                # Column 2: 3-day forecast (use as 48h)
-                snow_forecast_span = cells[2].find('span', class_=lambda x: x and 'h4' in x)
-                resort['new_snow_48h'] = self._parse_measurement(snow_forecast_span.get_text(strip=True)) if snow_forecast_span else 0
-                
-                # Column 3: Base depth
-                base_span = cells[3].find('span', class_=lambda x: x and 'h4' in x)
-                resort['base_depth'] = self._parse_measurement(base_span.get_text(strip=True)) if base_span else 0
-                
-                # Column 4: Trails open (format: "4/140")
-                # Cell structure: <span class="h4">4/140<div class="small">3% Open</div></span>
-                # We only want "4/140", not the nested div text
-                trails_span = cells[4].find('span', class_=lambda x: x and 'h4' in x)
-                if trails_span:
-                    # Get only direct text, not from child elements
-                    # Use .contents to filter out nested divs
-                    direct_text = ''.join([str(c) for c in trails_span.contents if isinstance(c, str)])
-                    trails_text = direct_text.strip().rstrip('-')
-                    # If empty, try the first text node
-                    if not trails_text or '/' not in trails_text:
-                        all_text = trails_span.get_text(strip=True)
-                        # Extract just the X/Y part before any letters
-                        match = re.match(r'(\d+/\d+)', all_text)
-                        trails_text = match.group(1) if match else '0/0'
-                else:
-                    trails_text = '0/0'
-                resort['trails_open'] = trails_text
-                
-                # Column 5: Lifts open (format: "4/21")
-                lifts_span = cells[5].find('span', class_=lambda x: x and 'h4' in x)
-                if lifts_span:
-                    # Get only direct text, not from child elements
-                    direct_text = ''.join([str(c) for c in lifts_span.contents if isinstance(c, str)])
-                    lifts_text = direct_text.strip().rstrip('-')
-                    # If empty, extract X/Y pattern
-                    if not lifts_text or '/' not in lifts_text:
-                        all_text = lifts_span.get_text(strip=True)
-                        match = re.match(r'(\d+/\d+)', all_text)
-                        lifts_text = match.group(1) if match else '0/0'
-                else:
-                    lifts_text = '0/0'
-                resort['lifts_open'] = lifts_text
-                
-            else:
-                # CLOSED RESORT - just name and opening date
-                resort['status'] = 'Closed'
-                resort['new_snow_24h'] = 0
-                resort['new_snow_48h'] = 0
-                resort['base_depth'] = 0
-                resort['trails_open'] = '0/0'
-                resort['lifts_open'] = '0/0'
-            
-            return resort
+            logger.info(f"Extracted {len(all_resorts)} resorts from JSON")
+            return all_resorts
             
         except Exception as e:
-            logger.debug(f"Error parsing row: {e}")
-            return None
-    
-    def _extract_resort_from_div(self, div):
-        """Extract resort data from div container"""
+            logger.error(f"Error parsing JSON data: {e}")
+            return []
+
+    def _parse_resort_json(self, resort_json):
+        """Parse individual resort from JSON structure"""
         try:
-            name_elem = div.find(['h2', 'h3', 'h4', 'a'])
-            if not name_elem:
+            name = resort_json.get('title', '')
+            if not name:
                 return None
+
+            # Status: openFlag values: 1=Open, 2=Closed, 5=Weekends Only
+            open_flag = resort_json.get('status', {}).get('openFlag', 2)
+            if open_flag in [1, 5]:
+                status = 'Open'
+            else:
+                status = 'Closed'
+
+            # Snow data (values are in cm in the JSON)
+            snow = resort_json.get('snow', {})
             
-            name = name_elem.get_text(strip=True)
-            if len(name) < 3:
-                return None
+            def cm_to_in(cm):
+                if cm is None: return 0
+                return round(float(cm) / 2.54)
+
+            base_depth = cm_to_in(snow.get('base') or snow.get('middle') or 0)
+            new_snow_24h = cm_to_in(snow.get('last24', 0))
+            new_snow_48h = cm_to_in(snow.get('last48', 0))
+
+            # Lifts data
+            lifts = resort_json.get('lifts', {})
+            open_lifts = lifts.get('open', 0) or 0
+            total_lifts = lifts.get('total', 0) or 0
             
+            # Trails/Runs data
+            runs = resort_json.get('runs', {})
+            open_trails = runs.get('open', 0) or 0
+            total_trails = runs.get('total', 0) or 0
+
             resort = {
                 'name': name,
-                'new_snow_24h': 0,
-                'new_snow_48h': 0,
-                'base_depth': 0,
-                'lifts_open': '0/0',
-                'trails_open': '0/0',
-                'status': 'Unknown'
+                'status': status,
+                'new_snow_24h': int(new_snow_24h),
+                'new_snow_48h': int(new_snow_48h),
+                'base_depth': int(base_depth),
+                'open_lifts': int(open_lifts),
+                'total_lifts': int(total_lifts),
+                'open_trails': int(open_trails),
+                'total_trails': int(total_trails),
+                'lifts_open': f"{open_lifts}/{total_lifts}",
+                'trails_open': f"{open_trails}/{total_trails}",
+                'slug': resort_json.get('slug', ''),
             }
-            
-            # Extract data from div text
-            div_text = div.get_text()
-            
-            # Look for measurements
-            measurements = re.findall(r'(\d+)"', div_text)
-            if len(measurements) >= 1:
-                resort['new_snow_24h'] = int(measurements[0])
-            if len(measurements) >= 2:
-                resort['base_depth'] = int(measurements[1])
-            
-            # Look for lift/trail data
-            counts = re.findall(r'(\d+/\d+)', div_text)
-            if len(counts) >= 1:
-                resort['lifts_open'] = counts[0]
-            
+
             return resort
-            
+
         except Exception as e:
-            logger.debug(f"Error parsing div: {e}")
+            logger.warning(f"Error parsing resort JSON: {e}")
             return None
-    
-    def _parse_measurement(self, text):
-        """Extract measurement in inches from text like '5\"' or '0-1\"' or '18 in'"""
-        # Handle ranges like "0-1\""
-        range_match = re.search(r'(\d+)-(\d+)', text)
-        if range_match:
-            # Take the higher number
-            return int(range_match.group(2))
-        
-        # Handle simple numbers like "5\"" or "18 in"
-        num_match = re.search(r'(\d+)', text)
-        if num_match:
-            return int(num_match.group(1))
-        
-        return 0
-    
+
     def scrape(self):
         """Main scraping method"""
         try:
@@ -285,12 +191,11 @@ class OnTheSnowScraper:
             # Save HTML for debugging
             with open('onthesnow_page_rendered.html', 'w', encoding='utf-8') as f:
                 f.write(html)
-            logger.info("Saved rendered HTML to onthesnow_page_rendered.html")
             
-            resorts = self.parse_snow_data(html)
+            resorts = self.parse_json_data(html)
             
             if not resorts:
-                logger.warning("No resort data found! Check HTML file for structure")
+                logger.warning("No resort data found!")
                 return pd.DataFrame()
             
             # Convert to DataFrame
@@ -300,44 +205,52 @@ class OnTheSnowScraper:
             df['data_fetched_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             df['source'] = 'OnTheSnow'
             
-            # Clean up data
-            df = self._clean_data(df)
+            # --- IMPROVEMENT: Visit individual pages for extra detail ---
+            # We do this for all resorts to get "Surface Conditions" and other specifics
+            # To save time, we'll only do it for "Open" resorts
+            open_resorts = df[df['status'] == 'Open'].copy()
+            logger.info(f"Visiting individual pages for {len(open_resorts)} open resorts for extra detail...")
             
+            for idx, row in open_resorts.iterrows():
+                if row['slug']:
+                    try:
+                        detail_url = f"https://www.onthesnow.com/colorado/{row['slug']}/skireport"
+                        logger.info(f"  -> Detail: {row['name']} ({detail_url})")
+                        
+                        self.driver.get(detail_url)
+                        time.sleep(3) # Wait for render
+                        
+                        detail_html = self.driver.page_source
+                        
+                        # Look for Surface Conditions text
+                        # It often appears in a cell with "Machine Groomed", "Powder", etc.
+                        # We'll use a simple regex search in the HTML for common condition words
+                        conditions = ["Machine Groomed", "Packed Powder", "Powder", "Variable Conditions", "Spring Conditions", "Icy", "Hard Pack"]
+                        found_condition = "-"
+                        for cond in conditions:
+                            if cond in detail_html:
+                                found_condition = cond
+                                break
+                        
+                        df.at[idx, 'surface_conditions'] = found_condition
+                        
+                        # Also look for Mid-Mountain Depth if available
+                        # This is harder to find with simple regex, but let's try
+                        match = re.search(r'Mid-Mt Depth.*?([0-9]+)"', detail_html, re.DOTALL | re.IGNORECASE)
+                        if match:
+                            df.at[idx, 'mid_mtn_depth'] = int(match.group(1))
+                        
+                    except Exception as e:
+                        logger.warning(f"Failed to get details for {row['name']}: {e}")
+            
+            # Sort by name
+            df = df.sort_values('name').reset_index(drop=True)
+            
+            logger.info(f"Scraped data for {len(df)} resorts")
             return df
             
         finally:
             self.cleanup()
-    
-    def _clean_data(self, df):
-        """Clean and standardize the data"""
-        # Ensure required columns exist
-        required_cols = ['name', 'new_snow_24h', 'new_snow_48h', 'base_depth', 'lifts_open', 'trails_open', 'status']
-        for col in required_cols:
-            if col not in df.columns:
-                if col in ['name', 'lifts_open', 'trails_open', 'status']:
-                    df[col] = '' if col == 'name' else '0/0' if 'open' in col else 'Unknown'
-                else:
-                    df[col] = 0
-        
-        # Parse lifts and trails into separate columns
-        for field in ['lifts_open', 'trails_open']:
-            if field in df.columns:
-                col_prefix = field.replace('_open', '')
-                df[[f'open_{col_prefix}', f'total_{col_prefix}']] = df[field].str.extract(r'(\d+)/(\d+)')
-                df[f'open_{col_prefix}'] = pd.to_numeric(df[f'open_{col_prefix}'], errors='coerce').fillna(0).astype(int)
-                df[f'total_{col_prefix}'] = pd.to_numeric(df[f'total_{col_prefix}'], errors='coerce').fillna(0).astype(int)
-        
-        # Ensure numeric fields
-        for col in ['new_snow_24h', 'new_snow_48h', 'base_depth']:
-            if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
-        
-        # Sort by name
-        df = df.sort_values('name').reset_index(drop=True)
-        
-        logger.info(f"Cleaned data for {len(df)} resorts")
-        
-        return df
     
     def cleanup(self):
         """Clean up resources"""
@@ -361,7 +274,7 @@ def main():
         df = scraper.scrape()
         
         if df.empty:
-            logger.error("No data scraped - check the HTML file for page structure")
+            logger.error("No data scraped")
             return
         
         # Save results
@@ -370,25 +283,7 @@ def main():
         logger.info(f"✅ Saved data to {output_file}")
         
         # Display summary
-        logger.info(f"\n{'='*70}")
-        logger.info("SCRAPING RESULTS")
-        logger.info(f"{'='*70}")
-        logger.info(f"Total resorts: {len(df)}")
-        logger.info(f"\nAll resorts found:")
-        for idx, name in enumerate(df['name'].tolist(), 1):
-            logger.info(f"  {idx}. {name}")
-        
-        # Show sample data
-        logger.info(f"\nSample data (first 5 resorts):")
-        cols = ['name', 'new_snow_24h', 'base_depth', 'lifts_open', 'status']
-        print(df[cols].head().to_string())
-        
-        # Check for open resorts
-        open_resorts = df[df['status'] == 'Open']
-        if len(open_resorts) > 0:
-            logger.info(f"\n🎿 {len(open_resorts)} resorts currently OPEN:")
-            for _, resort in open_resorts.iterrows():
-                logger.info(f"  - {resort['name']}: {resort['lifts_open']} lifts")
+        print(df[['name', 'new_snow_24h', 'base_depth', 'status']].head().to_string())
         
     except Exception as e:
         logger.error(f"Scraping failed: {e}")
@@ -398,4 +293,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -10,6 +10,7 @@ import logging
 from datetime import datetime
 from onthesnow_scraper import OnTheSnowScraper
 from colorado_ski_scraper import ColoradoSkiScraper
+from aspen_snowmass_scraper import AspenSnowmassScraper
 
 # Colorado resort coordinates and trail counts
 # Trail counts from user's manual data CSV (Colorado Ski Area Data - Sheet1.csv)
@@ -47,6 +48,9 @@ RESORT_DATA = {
     'Winter Park': {'lat': 39.8627761, 'lng': -105.77874, 'total_trails': 171, 'total_lifts': 24},
     'Wolf Creek': {'lat': 37.4717059, 'lng': -106.78829, 'total_trails': 133, 'total_lifts': 7},
 }
+
+# Max snowfall cap to handle data errors (inches)
+MAX_24H_SNOWFALL = 12
 
 # Setup logging
 logging.basicConfig(
@@ -186,6 +190,20 @@ def combine_resort_data():
         ots_df = ots_scraper.scrape()
         
         if not ots_df.empty:
+            # Filter out aggregated "Aspen Snowmass" entry to avoid double pins
+            # We rely on CSCUSA for individual Aspen mountains
+            aspen_mask = ots_df['name'].str.contains('Aspen Snowmass', case=False, na=False)
+            if aspen_mask.any():
+                logger.info(f"🗑️ Filtering out aggregated 'Aspen Snowmass' from OnTheSnow")
+                ots_df = ots_df[~aspen_mask].copy()
+
+            # Apply snowfall sanity check
+            high_snow_mask = ots_df['new_snow_24h'] > MAX_24H_SNOWFALL
+            if high_snow_mask.any():
+                for idx, row in ots_df[high_snow_mask].iterrows():
+                    logger.warning(f"⚠️ High snowfall detected for {row['name']}: {row['new_snow_24h']}\". Capping at {MAX_24H_SNOWFALL}\".")
+                ots_df.loc[high_snow_mask, 'new_snow_24h'] = MAX_24H_SNOWFALL
+
             logger.info(f"✅ OnTheSnow: Found {len(ots_df)} resorts")
             all_resorts.append(ots_df)
             ots_resort_names = set(ots_df['name'].str.lower())
@@ -211,6 +229,13 @@ def combine_resort_data():
             new_resorts = cscusa_df[~cscusa_df['name_lower'].isin(ots_resort_names)]
             
             if len(new_resorts) > 0:
+                # Apply snowfall sanity check to CSCUSA data too
+                high_snow_mask = new_resorts['new_snow_24h'] > MAX_24H_SNOWFALL
+                if high_snow_mask.any():
+                    for idx, row in new_resorts[high_snow_mask].iterrows():
+                        logger.warning(f"⚠️ High snowfall detected for {row['name']} (CSCUSA): {row['new_snow_24h']}\". Capping at {MAX_24H_SNOWFALL}\".")
+                    new_resorts.loc[high_snow_mask, 'new_snow_24h'] = MAX_24H_SNOWFALL
+
                 logger.info(f"📝 CSCUSA adds {len(new_resorts)} new resorts:")
                 for name in new_resorts['name']:
                     logger.info(f"  + {name}")
@@ -227,7 +252,21 @@ def combine_resort_data():
     except Exception as e:
         logger.error(f"❌ CSCUSA scraper failed: {e}")
     
-    # 3. Combine all data
+    # 3. Get Aspen Official data (granular supplement)
+    aspen_official_data = {}
+    logger.info("\n📊 Step 3: Scraping Aspen Official (granular snow supplement)...")
+    try:
+        aspen_scraper = AspenSnowmassScraper(headless=True)
+        aspen_df = aspen_scraper.scrape()
+        if not aspen_df.empty:
+            logger.info(f"✅ Aspen Official: Found {len(aspen_df)} mountains")
+            # Store in a dict for easy lookup during the merge phase
+            for _, row in aspen_df.iterrows():
+                aspen_official_data[row['name']] = row.to_dict()
+    except Exception as e:
+        logger.error(f"❌ Aspen Official scraper failed: {e}")
+
+    # 4. Combine all data
     if not all_resorts:
         logger.error("❌ No data from any source!")
         return pd.DataFrame()
@@ -235,7 +274,6 @@ def combine_resort_data():
     combined_df = pd.concat(all_resorts, ignore_index=True)
     
     # Remove duplicate resorts with better deduplication logic
-    # Handle A-Basin appearing as both "Arapahoe Basin" and "Arapahoe Basin Ski Area"
     def normalize_name(name):
         """Normalize resort names for duplicate detection"""
         name = name.lower().strip()
@@ -247,15 +285,37 @@ def combine_resort_data():
     
     combined_df['name_normalized'] = combined_df['name'].apply(normalize_name)
     
-    # Remove duplicates, keeping OnTheSnow version (first occurrence)
+    # Sort to prioritize OnTheSnow/CSCUSA for terrain data
     combined_df = combined_df.drop_duplicates(subset=['name_normalized'], keep='first')
+    
+    # 5. PATCH ASPEN DATA: Overwrite all stats with official data if we have it
+    for idx, row in combined_df.iterrows():
+        name = row['name']
+        # Check if this name (or normalized version) is in our official Aspen data
+        official_match = None
+        if name in aspen_official_data:
+            official_match = aspen_official_data[name]
+        else:
+            # Try matching by normalized name for Aspen resorts
+            for a_name, a_data in aspen_official_data.items():
+                if normalize_name(a_name) == normalize_name(name):
+                    official_match = a_data
+                    break
+        
+        if official_match:
+            logger.info(f"💉 Patching {name} with 100% verified official data")
+            # Overwrite EVERYTHING from the official source
+            for key, value in official_match.items():
+                combined_df.at[idx, key] = value
+            combined_df.at[idx, 'source'] = "Aspen Official"
+
     combined_df = combined_df.drop(columns=['name_normalized'])
     
-    # 4. Add coordinates, trail counts, and calculate percentages
+    # 6. Add coordinates, trail counts, and calculate percentages
     logger.info("\n📍 Adding resort data (coordinates, trail counts, percentages)...")
     combined_df = add_resort_data(combined_df)
     
-    # 5. Add missing major resorts (not yet scraped but should be shown)
+    # 7. Add missing major resorts (not yet scraped but should be shown)
     logger.info("\n➕ Checking for missing major resorts...")
     combined_df = add_missing_major_resorts(combined_df)
     
@@ -267,8 +327,8 @@ def combine_resort_data():
     logger.info("FINAL COMBINED RESULTS")
     logger.info("="*70)
     logger.info(f"Total unique resorts: {len(combined_df)}")
-    logger.info(f"From OnTheSnow: {len(combined_df[combined_df['source'] == 'OnTheSnow'])}")
-    logger.info(f"From CSCUSA: {len(combined_df[combined_df['source'] == 'CSCUSA'])}")
+    logger.info(f"From OnTheSnow: {len(combined_df[combined_df['source'].str.contains('OnTheSnow', na=False)])}")
+    logger.info(f"From CSCUSA: {len(combined_df[combined_df['source'].str.contains('CSCUSA', na=False)])}")
     
     return combined_df
 
@@ -300,4 +360,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
