@@ -64,8 +64,10 @@ jobs:
       env:
         GOOGLE_SHEETS_SPREADSHEET_ID: ${{ secrets.GOOGLE_SHEETS_SPREADSHEET_ID }}
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        SKIP_DETAIL_PAGES: "true"  # Skip individual page visits for speed in CI
       run: |
         echo "Running combined scraper and Google Sheets update..."
+        echo "Mode: PARALLEL scraping with SKIP_DETAIL_PAGES=$SKIP_DETAIL_PAGES"
         python run_all_updates.py
         
         # Show the last 50 lines of the log if it exists

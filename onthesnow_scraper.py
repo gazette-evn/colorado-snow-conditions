@@ -32,10 +32,11 @@ logger = logging.getLogger(__name__)
 
 class OnTheSnowScraper:
     """Scrapes snow conditions from OnTheSnow.com for Colorado using embedded JSON"""
-    
-    def __init__(self, headless=True):
+
+    def __init__(self, headless=True, skip_detail_pages=False):
         self.url = "https://www.onthesnow.com/colorado/skireport.html"
         self.headless = headless
+        self.skip_detail_pages = skip_detail_pages
         self.driver = None
     
     def setup_driver(self):
@@ -208,6 +209,13 @@ class OnTheSnowScraper:
             # --- IMPROVEMENT: Visit individual pages for extra detail ---
             # We do this for all resorts to get "Surface Conditions" and other specifics
             # To save time, we'll only do it for "Open" resorts
+            # Can be skipped via skip_detail_pages flag for faster execution in CI
+            if self.skip_detail_pages:
+                logger.info("⚡ Skipping individual resort page visits (skip_detail_pages=True)")
+                df['surface_conditions'] = '-'
+                df['mid_mtn_depth'] = 0
+                return df
+
             open_resorts = df[df['status'] == 'Open'].copy()
             logger.info(f"Visiting individual pages for {len(open_resorts)} open resorts for extra detail...")
             

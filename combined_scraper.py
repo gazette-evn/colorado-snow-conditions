@@ -7,10 +7,15 @@ Adds coordinates from known resort locations
 
 import pandas as pd
 import logging
+import os
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from onthesnow_scraper import OnTheSnowScraper
 from colorado_ski_scraper import ColoradoSkiScraper
 from aspen_snowmass_scraper import AspenSnowmassScraper
+
+# Set to skip individual page visits for faster execution (e.g., in CI)
+SKIP_DETAIL_PAGES = os.environ.get('SKIP_DETAIL_PAGES', 'false').lower() == 'true'
 
 # Colorado resort coordinates and trail counts
 # Trail counts from user's manual data CSV (Colorado Ski Area Data - Sheet1.csv)
@@ -172,26 +177,15 @@ def add_missing_major_resorts(df):
     return df
 
 
-def combine_resort_data():
-    """
-    Scrape from both sources and combine
-    OnTheSnow is primary, CSCUSA supplements
-    """
-    logger.info("="*70)
-    logger.info("COMBINED SCRAPER - OnTheSnow + CSCUSA")
-    logger.info("="*70)
-    
-    all_resorts = []
-    
-    # 1. Get OnTheSnow data (primary source)
-    logger.info("\n📊 Step 1: Scraping OnTheSnow (primary source)...")
+def scrape_onthesnow():
+    """Scrape OnTheSnow data (runs in parallel)"""
+    logger.info("📊 [PARALLEL] Scraping OnTheSnow (primary source)...")
     try:
-        ots_scraper = OnTheSnowScraper(headless=True)
+        ots_scraper = OnTheSnowScraper(headless=True, skip_detail_pages=SKIP_DETAIL_PAGES)
         ots_df = ots_scraper.scrape()
-        
+
         if not ots_df.empty:
             # Filter out aggregated "Aspen Snowmass" entry to avoid double pins
-            # We rely on CSCUSA for individual Aspen mountains
             aspen_mask = ots_df['name'].str.contains('Aspen Snowmass', case=False, na=False)
             if aspen_mask.any():
                 logger.info(f"🗑️ Filtering out aggregated 'Aspen Snowmass' from OnTheSnow")
@@ -205,66 +199,120 @@ def combine_resort_data():
                 ots_df.loc[high_snow_mask, 'new_snow_24h'] = MAX_24H_SNOWFALL
 
             logger.info(f"✅ OnTheSnow: Found {len(ots_df)} resorts")
-            all_resorts.append(ots_df)
-            ots_resort_names = set(ots_df['name'].str.lower())
+            return ('onthesnow', ots_df)
         else:
             logger.warning("⚠️ OnTheSnow returned no data")
-            ots_resort_names = set()
-            
+            return ('onthesnow', pd.DataFrame())
+
     except Exception as e:
         logger.error(f"❌ OnTheSnow scraper failed: {e}")
-        ots_resort_names = set()
-    
-    # 2. Get CSCUSA data (supplement)
-    logger.info("\n📊 Step 2: Scraping CSCUSA (supplement)...")
+        return ('onthesnow', pd.DataFrame())
+
+
+def scrape_cscusa():
+    """Scrape CSCUSA data (runs in parallel)"""
+    logger.info("📊 [PARALLEL] Scraping CSCUSA (supplement)...")
     try:
         cscusa_scraper = ColoradoSkiScraper(headless=True)
         cscusa_df = cscusa_scraper.scrape()
-        
+
         if not cscusa_df.empty:
             logger.info(f"✅ CSCUSA: Found {len(cscusa_df)} resorts")
-            
-            # Only add resorts NOT in OnTheSnow
-            cscusa_df['name_lower'] = cscusa_df['name'].str.lower()
-            new_resorts = cscusa_df[~cscusa_df['name_lower'].isin(ots_resort_names)]
-            
-            if len(new_resorts) > 0:
-                # Apply snowfall sanity check to CSCUSA data too
-                high_snow_mask = new_resorts['new_snow_24h'] > MAX_24H_SNOWFALL
-                if high_snow_mask.any():
-                    for idx, row in new_resorts[high_snow_mask].iterrows():
-                        logger.warning(f"⚠️ High snowfall detected for {row['name']} (CSCUSA): {row['new_snow_24h']}\". Capping at {MAX_24H_SNOWFALL}\".")
-                    new_resorts.loc[high_snow_mask, 'new_snow_24h'] = MAX_24H_SNOWFALL
-
-                logger.info(f"📝 CSCUSA adds {len(new_resorts)} new resorts:")
-                for name in new_resorts['name']:
-                    logger.info(f"  + {name}")
-                
-                # Standardize columns to match OnTheSnow
-                new_resorts = new_resorts.copy()
-                new_resorts['source'] = 'CSCUSA'
-                all_resorts.append(new_resorts)
-            else:
-                logger.info("ℹ️ CSCUSA had no additional resorts (all already in OnTheSnow)")
+            return ('cscusa', cscusa_df)
         else:
             logger.warning("⚠️ CSCUSA returned no data")
-            
+            return ('cscusa', pd.DataFrame())
+
     except Exception as e:
         logger.error(f"❌ CSCUSA scraper failed: {e}")
-    
-    # 3. Get Aspen Official data (granular supplement)
-    aspen_official_data = {}
-    logger.info("\n📊 Step 3: Scraping Aspen Official (granular snow supplement)...")
+        return ('cscusa', pd.DataFrame())
+
+
+def scrape_aspen():
+    """Scrape Aspen Official data (runs in parallel)"""
+    logger.info("📊 [PARALLEL] Scraping Aspen Official (granular snow supplement)...")
     try:
         aspen_scraper = AspenSnowmassScraper(headless=True)
         aspen_df = aspen_scraper.scrape()
         if not aspen_df.empty:
             logger.info(f"✅ Aspen Official: Found {len(aspen_df)} mountains")
-            # Store in a dict for easy lookup during the merge phase
-            for _, row in aspen_df.iterrows():
-                aspen_official_data[row['name']] = row.to_dict()
+            return ('aspen', aspen_df)
+        else:
+            logger.warning("⚠️ Aspen Official returned no data")
+            return ('aspen', pd.DataFrame())
     except Exception as e:
         logger.error(f"❌ Aspen Official scraper failed: {e}")
+        return ('aspen', pd.DataFrame())
+
+
+def combine_resort_data():
+    """
+    Scrape from all sources IN PARALLEL and combine
+    OnTheSnow is primary, CSCUSA supplements, Aspen provides granular data
+    """
+    logger.info("="*70)
+    logger.info("COMBINED SCRAPER - PARALLEL MODE")
+    logger.info("="*70)
+    if SKIP_DETAIL_PAGES:
+        logger.info("⚡ SKIP_DETAIL_PAGES=true - skipping individual resort page visits for speed")
+
+    all_resorts = []
+    ots_df = pd.DataFrame()
+    cscusa_df = pd.DataFrame()
+    aspen_official_data = {}
+
+    # Run all three scrapers in parallel
+    logger.info("\n🚀 Starting parallel scraping of all data sources...")
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {
+            executor.submit(scrape_onthesnow): 'OnTheSnow',
+            executor.submit(scrape_cscusa): 'CSCUSA',
+            executor.submit(scrape_aspen): 'Aspen'
+        }
+
+        for future in as_completed(futures):
+            source_name = futures[future]
+            try:
+                source_key, df = future.result(timeout=300)  # 5 min timeout per scraper
+
+                if source_key == 'onthesnow' and not df.empty:
+                    ots_df = df
+                    all_resorts.append(df)
+                elif source_key == 'cscusa' and not df.empty:
+                    cscusa_df = df
+                elif source_key == 'aspen' and not df.empty:
+                    for _, row in df.iterrows():
+                        aspen_official_data[row['name']] = row.to_dict()
+
+                logger.info(f"✅ {source_name} completed")
+            except Exception as e:
+                logger.error(f"❌ {source_name} failed: {e}")
+
+    logger.info("\n📊 Processing CSCUSA supplement data...")
+    # Now process CSCUSA data - only add resorts NOT in OnTheSnow
+    if not cscusa_df.empty:
+        ots_resort_names = set(ots_df['name'].str.lower()) if not ots_df.empty else set()
+        cscusa_df['name_lower'] = cscusa_df['name'].str.lower()
+        new_resorts = cscusa_df[~cscusa_df['name_lower'].isin(ots_resort_names)]
+
+        if len(new_resorts) > 0:
+            # Apply snowfall sanity check to CSCUSA data too
+            high_snow_mask = new_resorts['new_snow_24h'] > MAX_24H_SNOWFALL
+            if high_snow_mask.any():
+                for idx, row in new_resorts[high_snow_mask].iterrows():
+                    logger.warning(f"⚠️ High snowfall detected for {row['name']} (CSCUSA): {row['new_snow_24h']}\". Capping at {MAX_24H_SNOWFALL}\".")
+                new_resorts = new_resorts.copy()
+                new_resorts.loc[high_snow_mask, 'new_snow_24h'] = MAX_24H_SNOWFALL
+
+            logger.info(f"📝 CSCUSA adds {len(new_resorts)} new resorts:")
+            for name in new_resorts['name']:
+                logger.info(f"  + {name}")
+
+            new_resorts = new_resorts.copy()
+            new_resorts['source'] = 'CSCUSA'
+            all_resorts.append(new_resorts)
+        else:
+            logger.info("ℹ️ CSCUSA had no additional resorts (all already in OnTheSnow)")
 
     # 4. Combine all data
     if not all_resorts:

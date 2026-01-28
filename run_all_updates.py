@@ -48,7 +48,7 @@ def run_script(script_name, description):
             return False
             
     except subprocess.TimeoutExpired:
-        logging.error(f"❌ {description} timed out (>5 minutes)")
+        logging.error(f"❌ {description} timed out (>10 minutes)")
         return False
     except Exception as e:
         logging.error(f"❌ {description} failed with exception: {e}")
